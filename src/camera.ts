@@ -96,7 +96,7 @@ export function drawCamera() {
             ? verticalIntersection.y 
             : horizontalIntersection.x;
 
-        textureOffset = Math.floor(textureOffset - Math.floor(textureOffset / MAP_SCALE) * MAP_SCALE);
+        textureOffset = textureOffset - Math.floor(textureOffset / MAP_SCALE) * MAP_SCALE;
 
         let textureIndex = verticalIntersection.depth < horizontalIntersection.depth 
             ? verticalIntersection.texture 
@@ -135,7 +135,7 @@ export function drawCamera() {
             1,
             MAP_SCALE,
             map.offsetX + ray,
-            map.offsetY + Math.floor(HEIGHT / 2 - wallHeight / 2),
+            map.offsetY + HEIGHT / 2 - wallHeight / 2,
             1,
             wallHeight
         );
