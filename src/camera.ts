@@ -86,8 +86,8 @@ export function drawCamera() {
     let currentAngle = player.angle + (FOV / 2);
 
     for (let ray = 0; ray < WIDTH; ray++) {
-        const sinAngle = Math.sin(currentAngle) || 0.000001;
-        const cosAngle = Math.cos(currentAngle) || 0.000001;
+        const sinAngle = Math.sin(currentAngle);
+        const cosAngle = Math.cos(currentAngle);
 
         const verticalIntersection = calculateVerticalIntersection(sinAngle, cosAngle);
         const horizontalIntersection = calculateHorizontalIntersection(sinAngle, cosAngle);
@@ -115,7 +115,7 @@ export function drawCamera() {
         // context.stroke();
 
         let depth = closestIntersection.depth * Math.cos(player.angle - currentAngle);
-        let wallHeight = MAP_SCALE * 280 / (depth + 0.00001);
+        let wallHeight = MAP_SCALE * 280 / depth;
 
         
         // context.fillStyle = verticalIntersection.depth < horizontalIntersection.depth
