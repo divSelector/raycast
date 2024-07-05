@@ -115,7 +115,8 @@ export function drawCamera() {
         // context.stroke();
 
         let depth = closestIntersection.depth * Math.cos(player.angle - currentAngle);
-        let wallHeight = Math.min(MAP_SCALE * 280 / (depth + 0.00001), Infinity);
+        let wallHeight = MAP_SCALE * 280 / (depth + 0.00001);
+
         
         // context.fillStyle = verticalIntersection.depth < horizontalIntersection.depth
         //     ? '#aaa'
