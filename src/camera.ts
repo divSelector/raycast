@@ -6,8 +6,13 @@ import { level } from "./dungeon";
 
 export const DOUBLE_PI = Math.PI * 2;
 export const FOV = Math.PI / 3;
-const STEP_ANGLE = FOV / WIDTH;
 
+const STEP_ANGLE = FOV / WIDTH;
+const TEXTURED_WALLS_ENABLED = true;
+
+const torchRange = 600;
+const torchIntensity = 0.9; 
+const LIGHTING_OVERLAY_ALPHA = 0.4;
 
 interface RayIntersection {
     x: number;
@@ -82,9 +87,48 @@ function calculateHorizontalIntersection(sinAngle: number, cosAngle: number): Ra
     return { x: rayEndX, y: rayEndY, depth, texture };
 }
 
-const torchRange = 600;
-const torchIntensity = 0.9; 
+function drawRectangleWalls(vI: RayIntersection, hI: RayIntersection, ray: number, wallHeight: number) {
+    context.fillStyle = vI.depth < hI.depth
+        ? '#aaa'
+        : '#555';
+    context.fillRect(
+        map.offsetX + ray, 
+        map.offsetY + (HEIGHT / 2 - wallHeight / 2), 
+        1, 
+        wallHeight
+    );
+}
 
+function drawTextureWalls(textureIndex: number, textureOffset: number, ray: number, wallHeight: number) {
+    context.drawImage(
+        walls[textureIndex - 1],
+        textureOffset,
+        0,
+        1,
+        MAP_SCALE,
+        map.offsetX + ray,
+        map.offsetY + HEIGHT / 2 - wallHeight / 2,
+        1,
+        wallHeight
+    );
+}
+
+
+function drawDistantWallLighting(intersection: RayIntersection, ray: number, wallHeight: number) {
+
+    const normalizedDistance = Math.min(intersection.depth / torchRange, 1);
+    const attenuationFactor = 1 - normalizedDistance;
+    const lightLevel = torchIntensity * attenuationFactor;
+    
+    context.fillStyle = `rgba(0, 0, 0, ${1-lightLevel})`;
+    context.fillRect(map.offsetX + ray, map.offsetY + (HEIGHT / 2 - wallHeight / 2), 1, wallHeight);
+
+}
+
+function drawLightingCanvasOverlay(alpha: number) {
+    context.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+    context.fillRect(map.offsetX, map.offsetY, WIDTH, HEIGHT);
+}
 
 export function drawCamera() {
 
@@ -97,60 +141,35 @@ export function drawCamera() {
         const verticalIntersection = calculateVerticalIntersection(sinAngle, cosAngle);
         const horizontalIntersection = calculateHorizontalIntersection(sinAngle, cosAngle);
 
-        let textureOffset = verticalIntersection.depth < horizontalIntersection.depth 
-            ? verticalIntersection.y 
-            : horizontalIntersection.x;
-
-        textureOffset = textureOffset % MAP_SCALE;
-
-        let textureIndex = verticalIntersection.depth < horizontalIntersection.depth 
-            ? verticalIntersection.texture 
-            : horizontalIntersection.texture;
-
         const closestIntersection = verticalIntersection.depth < horizontalIntersection.depth
             ? verticalIntersection
             : horizontalIntersection;
 
-
-        const normalizedDistance = Math.min(closestIntersection.depth / torchRange, 1); // Normalize distance to be between 0 and 1
-        const attenuationFactor = 1 - normalizedDistance; // Invert the distance: closer walls get higher lightLevel
-        const lightLevel = torchIntensity * attenuationFactor;
-
-
         let depth = closestIntersection.depth * Math.cos(player.angle - currentAngle);
         let wallHeight = MAP_SCALE * 280 / depth;
 
-        // context.fillStyle = verticalIntersection.depth < horizontalIntersection.depth
-        //     ? '#aaa'
-        //     : '#555';
-        // context.fillRect(
-        //     map.offsetX + ray, 
-        //     map.offsetY + (HEIGHT / 2 - wallHeight / 2), 
-        //     1, 
-        //     wallHeight
-        // );
-        
+        if (TEXTURED_WALLS_ENABLED) {
+            let textureOffset = verticalIntersection.depth < horizontalIntersection.depth 
+                ? verticalIntersection.y 
+                : horizontalIntersection.x;
 
-        context.drawImage(
-            walls[textureIndex - 1],
-            textureOffset,
-            0,
-            1,
-            MAP_SCALE,
-            map.offsetX + ray,
-            map.offsetY + HEIGHT / 2 - wallHeight / 2,
-            1,
-            wallHeight
-        );
-        context.fillStyle = `rgba(0, 0, 0, ${1-lightLevel})`;
-        context.fillRect(map.offsetX + ray, map.offsetY + (HEIGHT / 2 - wallHeight / 2), 1, wallHeight);
+            textureOffset = textureOffset % MAP_SCALE;
 
+            let textureIndex = verticalIntersection.depth < horizontalIntersection.depth 
+                ? verticalIntersection.texture 
+                : horizontalIntersection.texture;
 
+            drawTextureWalls(textureIndex, textureOffset, ray, wallHeight);
+
+        } else {
+            drawRectangleWalls(verticalIntersection, horizontalIntersection, ray, wallHeight);
+        }
+
+        drawDistantWallLighting(closestIntersection, ray, wallHeight);
 
         currentAngle -= STEP_ANGLE;
     }
 
+    drawLightingCanvasOverlay(LIGHTING_OVERLAY_ALPHA);
 
-    context.fillStyle = 'rgba(0, 0, 0, 0.4)'; // Adjust alpha value as needed
-    context.fillRect(map.offsetX, map.offsetY, WIDTH, HEIGHT);
 }
