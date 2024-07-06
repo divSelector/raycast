@@ -96,7 +96,7 @@ export function drawCamera() {
             ? verticalIntersection.y 
             : horizontalIntersection.x;
 
-        textureOffset = textureOffset - Math.floor(textureOffset / MAP_SCALE) * MAP_SCALE;
+        textureOffset = Math.floor(textureOffset) % MAP_SCALE;
 
         let textureIndex = verticalIntersection.depth < horizontalIntersection.depth 
             ? verticalIntersection.texture 
