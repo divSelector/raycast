@@ -5,6 +5,7 @@ import { drawMiniMap } from './map';
 import { drawMiniMapPlayer, movePlayer } from './player';
 import { drawCamera } from './camera';
 
+
 function gameLoop() {
 
   resizeCanvas();

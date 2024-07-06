@@ -1,9 +1,10 @@
-import { MAP_SCALE, MINIMAP_SCALE, MAP_SIZE, map, level, showMap } from "./map";
+import { MAP_SCALE, MINIMAP_SCALE, MAP_SIZE, map, showMap } from "./map";
 import { context } from "./canvas";
 import { DOUBLE_PI } from "./camera";
 import { isKeyPressed, getMouseDeltaX, requestPointerLock } from "./input";
+import { level } from "./dungeon";
 
-const MAP_SPEED = (MAP_SCALE / 2) / 10;
+const MAP_SPEED = (MAP_SCALE / 2) / 18;
 const PIVOT_SPEED = 0.05;
 
 document.addEventListener('click', requestPointerLock);
@@ -80,7 +81,7 @@ function updatePlayerMovement() {
     }
 
     const deltaX = getMouseDeltaX();
-    const rotationSpeed = 0.035;
+    const rotationSpeed = 0.045;
     player.moveAngle = -deltaX * rotationSpeed;
 }
 

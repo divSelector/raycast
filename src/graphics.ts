@@ -8,6 +8,11 @@ import wall6 from './assets/walls/6.png';
 import wall7 from './assets/walls/7.png';
 import wall8 from './assets/walls/8.png';
 import wall9 from './assets/walls/9.png';
+import wall10 from './assets/walls/10.png';
+import wall11 from './assets/walls/11.png';
+import wall12 from './assets/walls/12.png';
+import wall13 from './assets/walls/13.png';
+
 
 export const backgrounds: HTMLImageElement[] = [];
 export const walls: HTMLImageElement[] = [];
@@ -22,7 +27,9 @@ bgSources.forEach(src => {
 
 const wallSources = [
   wall1, wall2, wall3, wall4, 
-  wall5, wall6, wall7, wall8, wall9
+  wall5, wall6, wall7, wall8, 
+  wall9, wall10, wall11, wall12,
+  wall13
 ];
 
 wallSources.forEach(src => {

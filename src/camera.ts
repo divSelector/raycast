@@ -1,7 +1,8 @@
 import { WIDTH, HEIGHT, context } from "./canvas";
 import { walls } from "./graphics";
-import { MAP_SCALE, MAP_SIZE, MAP_RANGE, MINIMAP_SCALE, level, map } from "./map";
+import { MAP_SCALE, MAP_SIZE, MAP_RANGE, MINIMAP_SCALE, map } from "./map";
 import { player } from "./player";
+import { level } from "./dungeon";
 
 export const DOUBLE_PI = Math.PI * 2;
 export const FOV = Math.PI / 3;
@@ -109,7 +110,6 @@ export function drawCamera() {
         let depth = closestIntersection.depth * Math.cos(player.angle - currentAngle);
         let wallHeight = MAP_SCALE * 280 / depth;
 
-        
         // context.fillStyle = verticalIntersection.depth < horizontalIntersection.depth
         //     ? '#aaa'
         //     : '#555';
