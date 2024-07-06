@@ -3,7 +3,7 @@ import { isKeyJustPressed } from "./input";
 
 export const MAP_SIZE = 32;
 
-export const MAP_SCALE = 64;
+export const MAP_SCALE = 63;
 export const MINIMAP_SCALE = 5;
 
 export const MAP_RANGE = MAP_SIZE * MAP_SCALE;
