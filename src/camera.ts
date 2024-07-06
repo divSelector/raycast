@@ -82,6 +82,10 @@ function calculateHorizontalIntersection(sinAngle: number, cosAngle: number): Ra
     return { x: rayEndX, y: rayEndY, depth, texture };
 }
 
+const torchRange = 600;
+const torchIntensity = 0.9; 
+
+
 export function drawCamera() {
 
     let currentAngle = player.angle + (FOV / 2);
@@ -107,6 +111,12 @@ export function drawCamera() {
             ? verticalIntersection
             : horizontalIntersection;
 
+
+        const normalizedDistance = Math.min(closestIntersection.depth / torchRange, 1); // Normalize distance to be between 0 and 1
+        const attenuationFactor = 1 - normalizedDistance; // Invert the distance: closer walls get higher lightLevel
+        const lightLevel = torchIntensity * attenuationFactor;
+
+
         let depth = closestIntersection.depth * Math.cos(player.angle - currentAngle);
         let wallHeight = MAP_SCALE * 280 / depth;
 
@@ -119,6 +129,7 @@ export function drawCamera() {
         //     1, 
         //     wallHeight
         // );
+        
 
         context.drawImage(
             walls[textureIndex - 1],
@@ -131,8 +142,15 @@ export function drawCamera() {
             1,
             wallHeight
         );
+        context.fillStyle = `rgba(0, 0, 0, ${1-lightLevel})`;
+        context.fillRect(map.offsetX + ray, map.offsetY + (HEIGHT / 2 - wallHeight / 2), 1, wallHeight);
+
 
 
         currentAngle -= STEP_ANGLE;
     }
+
+
+    context.fillStyle = 'rgba(0, 0, 0, 0.4)'; // Adjust alpha value as needed
+    context.fillRect(map.offsetX, map.offsetY, WIDTH, HEIGHT);
 }

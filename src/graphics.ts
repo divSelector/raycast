@@ -1,4 +1,4 @@
-import bg0 from './assets/bg/0.png';
+import bg0 from './assets/bg/3.png';
 import wall1 from './assets/walls/1.png';
 import wall2 from './assets/walls/2.png';
 import wall3 from './assets/walls/3.png';

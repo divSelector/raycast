@@ -1,6 +1,6 @@
 const WIDTH = 32; // Width of the maze
 const HEIGHT = 32; // Height of the maze
-const WALL_TYPES = [3]; // Different wall types
+const WALL_TYPES = [4,5]; // Different wall types
 const EMPTY_SPACE = 0;
 const PLAYER_START_INDEX = 34; // Index for the player's starting position
 
