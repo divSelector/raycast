@@ -41,3 +41,30 @@ export function isKeyJustPressed(action: string): boolean {
     }
     return false;
 }
+
+
+let mouseDeltaX = 0;
+
+document.addEventListener('mousemove', function(event: MouseEvent) {
+    if (document.pointerLockElement) {
+        mouseDeltaX += event.movementX;
+    }
+});
+
+export function getMouseDeltaX(): number {
+    const deltaX = mouseDeltaX;
+    mouseDeltaX = 0;
+    return deltaX;
+}
+
+export function requestPointerLock() {
+    document.body.requestPointerLock();
+}
+
+document.addEventListener('pointerlockchange', function() {
+    if (document.pointerLockElement) {
+        console.log('Pointer lock enabled');
+    } else {
+        console.log('Pointer lock disabled');
+    }
+});

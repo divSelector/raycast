@@ -106,14 +106,6 @@ export function drawCamera() {
             ? verticalIntersection
             : horizontalIntersection;
 
-        // Render Raycast Cone
-        // context.strokeStyle = 'Yellow';
-        // context.lineWidth = 1;
-        // context.beginPath();
-        // context.moveTo((player.x / MAP_SCALE) * MINIMAP_SCALE + map.offsetX, (player.y / MAP_SCALE) * MINIMAP_SCALE + map.offsetY);
-        // context.lineTo((closestIntersection.x / MAP_SCALE) * MINIMAP_SCALE + map.offsetX, (closestIntersection.y / MAP_SCALE) * MINIMAP_SCALE + map.offsetY);
-        // context.stroke();
-
         let depth = closestIntersection.depth * Math.cos(player.angle - currentAngle);
         let wallHeight = MAP_SCALE * 280 / depth;
 
