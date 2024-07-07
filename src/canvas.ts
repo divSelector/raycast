@@ -4,7 +4,7 @@ import { map } from "./map";
 import { drawSprite } from "./sprite";
 import { DepthBufferItem, getDepthBufferByRayCast, depthBufferTypeGuard } from "./raycaster";
 import { HEIGHT, WIDTH, torchIntensity, torchRange  } from "./constants";
-
+import { debugCrowbar } from "./weapon";
 
 export const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 export const context = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -108,6 +108,8 @@ export function drawCamera() {
                 break;
         }
     }
+
+    debugCrowbar();
 
     drawLightingCanvasOverlay(LIGHTING_OVERLAY_ALPHA);
 }
