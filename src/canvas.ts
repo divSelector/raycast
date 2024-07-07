@@ -32,10 +32,14 @@ export function drawBackground() {
 
 
 export function drawCanvasClamp() {
-    // Prevents Wall Height From Extending Outside Canvas
     context.fillStyle = '#242424';
+    // Prevents Wall Height From Extending Outside Canvas
     context.fillRect(0, 0, canvas.width, map.offsetY);
     context.fillRect(0, map.offsetY + HEIGHT, canvas.width, canvas.width - map.offsetY + 200);
+
+    // Prevent Sprites from Extending Outside Canvas
+    context.fillRect(0, 0, map.offsetX, canvas.height);
+    context.fillRect(map.offsetX + WIDTH, 0, map.offsetX + 1, canvas.height);
 }
 
 
@@ -85,7 +89,7 @@ function drawDistantWallLighting(item: DepthBufferItem) {
 
 function drawLightingCanvasOverlay(alpha: number) {
     context.fillStyle = `rgba(0, 0, 0, ${alpha})`;
-    context.fillRect(map.offsetX, map.offsetY, WIDTH, HEIGHT);
+    context.fillRect(map.offsetX, map.offsetY, WIDTH + 1, HEIGHT);
 }
 
 
