@@ -176,7 +176,7 @@ function generateMaze(width: number, height: number): number[] {
 const DEFAULT_SPRITE_SIZE = 64;
 
 function placeSpritesInMaze(maze: number[], width: number, height: number): Sprite[] {
-    const margin = map.scale * 0.25;
+    const margin = map.scale * 0.30;
     let sprites: Sprite[] = [];
     
     for (let y = 0; y < height; y++) {
