@@ -3,7 +3,7 @@ import { player } from "./player";
 import { context, canvas } from "./canvas";
 import { spriteTextures } from "./graphics";
 import { DepthBufferItem, depthBufferTypeGuard } from "./raycaster";
-import { MAP_SCALE, WIDTH, STEP_ANGLE, FOV } from "./constants";
+import { MAP_SCALE, WIDTH, STEP_ANGLE, FOV, HEIGHT } from "./constants";
 
 const DEFAULT_SPRITE_SIZE = 64;
 const CENTRAL_RAY = Math.floor(WIDTH / 2) - 1;
@@ -71,7 +71,7 @@ export function drawSprite(item: DepthBufferItem) {
         context.drawImage(
             item.spriteTexture, 
             map.offsetX + item.ray - Math.floor(item.spriteHeight / 2), 
-            map.offsetY + (canvas.height / 2) - (item.spriteHeight / 2) + 10, 
+            map.offsetY + (HEIGHT / 2) - (item.spriteHeight / 2) + 10, 
             item.spriteHeight, 
             item.spriteHeight
         );
