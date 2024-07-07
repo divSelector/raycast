@@ -1,6 +1,5 @@
 import { MAP_SCALE, MINIMAP_SCALE, MAP_SIZE, map, showMap } from "./map";
 import { context } from "./canvas";
-import { DOUBLE_PI } from "./camera";
 import { isKeyPressed, getMouseDeltaX, requestPointerLock } from "./input";
 // import { level } from "./dungeon";
 import { level } from "./map";
@@ -45,7 +44,7 @@ export function drawMiniMapPlayer() {
     if (showMap) {
         context.fillStyle = 'Blue';
         context.beginPath();
-        context.arc(player.mapX, player.mapY, 2, 0, DOUBLE_PI);
+        context.arc(player.mapX, player.mapY, 2, 0, Math.PI * 2);
         context.fill();
 
         context.strokeStyle = 'Blue';

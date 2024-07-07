@@ -2,7 +2,7 @@ import { MAP_SCALE, map } from "./map";
 import { player } from "./player";
 import { context, WIDTH, canvas } from "./canvas";
 import { spriteTextures } from "./graphics";
-import { STEP_ANGLE, FOV, DepthBufferItem } from "./camera";
+import { STEP_ANGLE, FOV, DepthBufferItem, depthBufferTypeGuard } from "./raycaster";
 
 const DEFAULT_SPRITE_SIZE = 64;
 const CENTRAL_RAY = Math.floor(WIDTH / 2) - 1;
@@ -19,9 +19,6 @@ const spritesData: Sprite[] = [
     { x: MAP_SCALE * 5, y: MAP_SCALE * 5, texture: 0, width: DEFAULT_SPRITE_SIZE, height: DEFAULT_SPRITE_SIZE }
 ];
 
-export function isDepthBufferItemSprite(item: DepthBufferItem): item is DepthBufferItem & { spriteTexture: HTMLImageElement; spriteHeight: number } {
-    return item.type === 'sprite' && item.spriteTexture !== undefined && item.spriteHeight !== undefined;
-}
 
 export function addSpritesToDepthBuffer(depthBuffer: DepthBufferItem[]): DepthBufferItem[] {
 
@@ -69,7 +66,7 @@ export function addSpritesToDepthBuffer(depthBuffer: DepthBufferItem[]): DepthBu
 
 
 export function drawSprite(item: DepthBufferItem) {
-    if (isDepthBufferItemSprite(item)) {
+    if (depthBufferTypeGuard.isSprite(item)) {
         context.drawImage(
             item.spriteTexture, 
             map.offsetX + item.ray - Math.floor(item.spriteHeight / 2), 
