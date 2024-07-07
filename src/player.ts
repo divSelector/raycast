@@ -2,9 +2,8 @@ import { map, showMap } from "./map";
 import { context } from "./canvas";
 import { isKeyPressed, getMouseDeltaX, requestPointerLock } from "./input";
 import { level } from "./map";
-import { MAP_SCALE, MINIMAP_SCALE, MAP_SIZE } from "./constants";
 
-const MAP_SPEED = (MAP_SCALE / 2) / 18;
+const MAP_SPEED = (map.scale / 2) / 18;
 const PIVOT_SPEED = 0.05;
 
 document.addEventListener('click', requestPointerLock);
@@ -22,8 +21,8 @@ interface PlayerIface {
 }
 
 export const player: PlayerIface = {
-    x: MAP_SCALE + 10,
-    y: MAP_SCALE + 10,
+    x: map.scale + 10,
+    y: map.scale + 10,
     angle: Math.PI / 3,
     mapX: 0,
     mapY: 0,
@@ -34,8 +33,8 @@ export const player: PlayerIface = {
 };
 
 function updatePlayerMapOffsets() {
-    player.mapX = (player.x / MAP_SCALE) * MINIMAP_SCALE + map.offsetX;
-    player.mapY = (player.y / MAP_SCALE) * MINIMAP_SCALE + map.offsetY;
+    player.mapX = (player.x / map.scale) * map.minimapScale + map.offsetX;
+    player.mapY = (player.y / map.scale) * map.minimapScale + map.offsetY;
 }
 
 export function drawMiniMapPlayer() {
@@ -97,11 +96,11 @@ export function movePlayer() {
 
     const proximityLimit = 10;
 
-    const targetX = Math.floor(player.y / MAP_SCALE) * MAP_SIZE + Math.floor((player.x + playerOffsetX * player.moveX * proximityLimit) / MAP_SCALE);
-    const targetY = Math.floor((player.y + playerOffsetY * player.moveY * proximityLimit) / MAP_SCALE) * MAP_SIZE + Math.floor(player.x / MAP_SCALE);
+    const targetX = Math.floor(player.y / map.scale) * map.size + Math.floor((player.x + playerOffsetX * player.moveX * proximityLimit) / map.scale);
+    const targetY = Math.floor((player.y + playerOffsetY * player.moveY * proximityLimit) / map.scale) * map.size + Math.floor(player.x / map.scale);
 
-    const strafeTargetX = Math.floor((player.y + strafeOffsetY * player.strafeX * proximityLimit) / MAP_SCALE) * MAP_SIZE + Math.floor(player.x / MAP_SCALE);
-    const strafeTargetY = Math.floor(player.y / MAP_SCALE) * MAP_SIZE + Math.floor((player.x + strafeOffsetX * player.strafeX * proximityLimit) / MAP_SCALE);
+    const strafeTargetX = Math.floor((player.y + strafeOffsetY * player.strafeX * proximityLimit) / map.scale) * map.size + Math.floor(player.x / map.scale);
+    const strafeTargetY = Math.floor(player.y / map.scale) * map.size + Math.floor((player.x + strafeOffsetX * player.strafeX * proximityLimit) / map.scale);
 
 
     if (player.moveX && level[targetX] == 0) {

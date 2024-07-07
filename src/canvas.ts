@@ -3,7 +3,7 @@ import { walls } from "./graphics";
 import { map } from "./map";
 import { drawSprite } from "./sprite";
 import { DepthBufferItem, getDepthBufferByRayCast, depthBufferTypeGuard } from "./raycaster";
-import { MAP_SCALE, HEIGHT, WIDTH, torchIntensity, torchRange  } from "./constants";
+import { HEIGHT, WIDTH, torchIntensity, torchRange  } from "./constants";
 
 
 export const canvas = document.querySelector('canvas') as HTMLCanvasElement;
@@ -62,7 +62,7 @@ function drawTextureWall(item: DepthBufferItem) {
             item.textureOffset,
             0,
             1,
-            MAP_SCALE,
+            map.scale,
             map.offsetX + item.ray,
             map.offsetY + HEIGHT / 2 - item.wallHeight / 2,
             1,

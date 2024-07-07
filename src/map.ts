@@ -1,6 +1,6 @@
 import { canvas, context } from "./canvas";
 import { isKeyJustPressed } from "./input";
-import { WIDTH, HEIGHT, MAP_SIZE, MINIMAP_SCALE } from "./constants";
+import { WIDTH, HEIGHT } from "./constants";
 // import { level } from "./dungeon";
 
 
@@ -44,11 +44,17 @@ export let showMap: boolean = false;
 export interface MapIface {
     offsetX: number;
     offsetY: number;
+    scale: number;
+    size: number;
+    minimapScale: number;
 }
 
 export const map: MapIface = {
     offsetX: 0,
-    offsetY: 0
+    offsetY: 0,
+    scale: 63,
+    size: 32,
+    minimapScale: 5
 };
 
 function updateMiniMapOffsets() {
@@ -72,18 +78,18 @@ export function drawMiniMap() {
     updateMiniMapOffsets();
 
     if (showMap) {
-        for (let row = 0; row < MAP_SIZE; row++) {
-            for (let col = 0; col < MAP_SIZE; col++) {
-                const square = row * MAP_SIZE + col;
+        for (let row = 0; row < map.size; row++) {
+            for (let col = 0; col < map.size; col++) {
+                const square = row * map.size + col;
                 if (level[square]) {
                     context.fillStyle = '#555';
                 } else {
                     context.fillStyle = '#aaa';
                 }
                 context.fillRect(
-                    map.offsetX + col * MINIMAP_SCALE, 
-                    map.offsetY + row * MINIMAP_SCALE, 
-                    MINIMAP_SCALE, MINIMAP_SCALE
+                    map.offsetX + col * map.minimapScale, 
+                    map.offsetY + row * map.minimapScale, 
+                    map.minimapScale, map.minimapScale
                 )
             }
         }

@@ -3,7 +3,7 @@ import { player } from "./player";
 import { context } from "./canvas";
 import { spriteTextures } from "./graphics";
 import { DepthBufferItem, depthBufferTypeGuard } from "./raycaster";
-import { MAP_SCALE, WIDTH, STEP_ANGLE, FOV, HEIGHT, torchIntensity, torchRange } from "./constants";
+import { WIDTH, STEP_ANGLE, FOV, HEIGHT, torchRange } from "./constants";
 import { normalizeAngle } from "./math";
 
 const DEFAULT_SPRITE_SIZE = 64;
@@ -18,7 +18,7 @@ interface Sprite {
 }
 
 const spritesData: Sprite[] = [
-    { x: MAP_SCALE * 5, y: MAP_SCALE * 5, texture: 0, width: DEFAULT_SPRITE_SIZE, height: DEFAULT_SPRITE_SIZE }
+    { x: map.scale * 5, y: map.scale * 5, texture: 0, width: DEFAULT_SPRITE_SIZE, height: DEFAULT_SPRITE_SIZE }
 ];
 
 
@@ -37,7 +37,7 @@ export function addSpritesToDepthBuffer(depthBuffer: DepthBufferItem[]): DepthBu
         const spriteRay = CENTRAL_RAY - shiftRays;
         
         const perpendicularDistance = spriteDistance * Math.cos(sprite2playerAngle);
-        const spriteHeight = MAP_SCALE * 280 / perpendicularDistance;
+        const spriteHeight = map.scale * 280 / perpendicularDistance;
         const spriteScreenX = (WIDTH / 2) * (1 + Math.tan(sprite2playerAngle) / Math.tan(FOV / 2));
 
         const spriteTexture = spriteTextures[sprite.texture];

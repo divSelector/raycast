@@ -1,10 +1,11 @@
 import { player } from "./player";
 import { level } from "./map";
 import { addSpritesToDepthBuffer } from "./sprite";
-import { WIDTH, FOV, STEP_ANGLE, MAP_SCALE, MAP_SIZE, MAP_RANGE } from "./constants";
+import { WIDTH, FOV, STEP_ANGLE } from "./constants";
+import { map } from "./map";
 
 const TEXTURED_WALLS_ENABLED = true;
-
+const MAP_RANGE = map.scale * map.size;
 
 
 export interface RayIntersection {
@@ -55,26 +56,26 @@ function calculateVerticalIntersection(sinAngle: number, cosAngle: number): RayI
 
     let directionX = sinAngle > 0 ? 1 : -1;
     let initialX = directionX > 0
-        ? Math.floor(player.x / MAP_SCALE) * MAP_SCALE + MAP_SCALE
-        : Math.floor(player.x / MAP_SCALE) * MAP_SCALE;
+        ? Math.floor(player.x / map.scale) * map.scale + map.scale
+        : Math.floor(player.x / map.scale) * map.scale;
 
-    for (let offset = 0; offset < MAP_RANGE; offset += MAP_SCALE) {
+    for (let offset = 0; offset < MAP_RANGE; offset += map.scale) {
         depth = (initialX - player.x) / sinAngle;
         rayEndY = player.y + depth * cosAngle;
         rayEndX = initialX;
         
-        let mapTargetX = Math.floor(rayEndX / MAP_SCALE);
-        let mapTargetY = Math.floor(rayEndY / MAP_SCALE);
+        let mapTargetX = Math.floor(rayEndX / map.scale);
+        let mapTargetY = Math.floor(rayEndY / map.scale);
         if (directionX < 0) mapTargetX += directionX;
         
-        let targetSquare = mapTargetY * MAP_SIZE + mapTargetX;
+        let targetSquare = mapTargetY * map.size + mapTargetX;
         if (targetSquare < 0 || targetSquare >= level.length) break;
         if (level[targetSquare] !== 0) {
             texture = level[targetSquare];
             break;
         }
 
-        initialX += directionX * MAP_SCALE;
+        initialX += directionX * map.scale;
     }
 
     return { x: rayEndX, y: rayEndY, depth, texture };
@@ -89,26 +90,26 @@ function calculateHorizontalIntersection(sinAngle: number, cosAngle: number): Ra
 
     let directionY = cosAngle > 0 ? 1 : -1;
     let initialY = directionY > 0
-        ? Math.floor(player.y / MAP_SCALE) * MAP_SCALE + MAP_SCALE
-        : Math.floor(player.y / MAP_SCALE) * MAP_SCALE;
+        ? Math.floor(player.y / map.scale) * map.scale + map.scale
+        : Math.floor(player.y / map.scale) * map.scale;
 
-    for (let offset = 0; offset < MAP_RANGE; offset += MAP_SCALE) {
+    for (let offset = 0; offset < MAP_RANGE; offset += map.scale) {
         depth = (initialY - player.y) / cosAngle;
         rayEndX = player.x + depth * sinAngle;
         rayEndY = initialY;
 
-        let mapTargetX = Math.floor(rayEndX / MAP_SCALE);
-        let mapTargetY = Math.floor(rayEndY / MAP_SCALE);
+        let mapTargetX = Math.floor(rayEndX / map.scale);
+        let mapTargetY = Math.floor(rayEndY / map.scale);
         if (directionY < 0) mapTargetY += directionY;
 
-        let targetSquare = mapTargetY * MAP_SIZE + mapTargetX;
+        let targetSquare = mapTargetY * map.size + mapTargetX;
         if (targetSquare < 0 || targetSquare >= level.length) break;
         if (level[targetSquare] !== 0) {
             texture = level[targetSquare];
             break;
         }
 
-        initialY += directionY * MAP_SCALE;
+        initialY += directionY * map.scale;
     }
 
     return { x: rayEndX, y: rayEndY, depth, texture };
@@ -132,14 +133,14 @@ export function getDepthBufferByRayCast(): DepthBufferItem[] {
             : horizontalIntersection;
 
         let depth = closestIntersection.depth * Math.cos(player.angle - currentAngle);
-        let wallHeight = MAP_SCALE * 280 / depth;
+        let wallHeight = map.scale * 280 / depth;
 
         if (TEXTURED_WALLS_ENABLED) {
             let textureOffset = verticalIntersection.depth < horizontalIntersection.depth 
                 ? verticalIntersection.y 
                 : horizontalIntersection.x;
 
-            textureOffset = textureOffset % MAP_SCALE;
+            textureOffset = textureOffset % map.scale;
 
             let textureIndex = verticalIntersection.depth < horizontalIntersection.depth 
                 ? verticalIntersection.texture 
