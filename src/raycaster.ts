@@ -1,12 +1,10 @@
 import { player } from "./player";
-import { level, MAP_SCALE, MAP_SIZE, MAP_RANGE } from "./map";
-import { WIDTH } from "./canvas";
+import { level } from "./map";
 import { addSpritesToDepthBuffer } from "./sprite";
-
+import { WIDTH, FOV, STEP_ANGLE, MAP_SCALE, MAP_SIZE, MAP_RANGE } from "./constants";
 
 const TEXTURED_WALLS_ENABLED = true;
-export const FOV = Math.PI / 3;
-export const STEP_ANGLE = FOV / WIDTH;
+
 
 
 export interface RayIntersection {
@@ -158,7 +156,6 @@ export function getDepthBufferFromRayCast(): DepthBufferItem[] {
             });
 
         } else {
-
             const wallColor = verticalIntersection.depth < horizontalIntersection.depth 
                 ? '#aaa'
                 : '#555';

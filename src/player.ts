@@ -1,8 +1,8 @@
-import { MAP_SCALE, MINIMAP_SCALE, MAP_SIZE, map, showMap } from "./map";
+import { map, showMap } from "./map";
 import { context } from "./canvas";
 import { isKeyPressed, getMouseDeltaX, requestPointerLock } from "./input";
-// import { level } from "./dungeon";
 import { level } from "./map";
+import { MAP_SCALE, MINIMAP_SCALE, MAP_SIZE } from "./constants";
 
 const MAP_SPEED = (MAP_SCALE / 2) / 18;
 const PIVOT_SPEED = 0.05;

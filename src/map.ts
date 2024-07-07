@@ -1,13 +1,8 @@
-import { canvas, context, WIDTH, HEIGHT } from "./canvas";
+import { canvas, context } from "./canvas";
 import { isKeyJustPressed } from "./input";
+import { WIDTH, HEIGHT, MAP_SIZE, MINIMAP_SCALE } from "./constants";
 // import { level } from "./dungeon";
 
-export const MAP_SIZE = 32;
-
-export const MAP_SCALE = 63;
-export const MINIMAP_SCALE = 5;
-
-export const MAP_RANGE = MAP_SIZE * MAP_SCALE;
 
 export const level = [
     2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,

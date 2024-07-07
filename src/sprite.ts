@@ -1,8 +1,9 @@
-import { MAP_SCALE, map } from "./map";
+import { map } from "./map";
 import { player } from "./player";
-import { context, WIDTH, canvas } from "./canvas";
+import { context, canvas } from "./canvas";
 import { spriteTextures } from "./graphics";
-import { STEP_ANGLE, FOV, DepthBufferItem, depthBufferTypeGuard } from "./raycaster";
+import { DepthBufferItem, depthBufferTypeGuard } from "./raycaster";
+import { MAP_SCALE, WIDTH, STEP_ANGLE, FOV } from "./constants";
 
 const DEFAULT_SPRITE_SIZE = 64;
 const CENTRAL_RAY = Math.floor(WIDTH / 2) - 1;
