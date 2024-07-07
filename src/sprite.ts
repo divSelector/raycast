@@ -4,7 +4,7 @@ import { context } from "./canvas";
 import { spriteTextures } from "./graphics";
 import { DepthBufferItem, depthBufferTypeGuard } from "./raycaster";
 import { WIDTH, STEP_ANGLE, FOV, HEIGHT, torchRange } from "./constants";
-import { normalizeAngle } from "./math";
+import { normalizeSprite2PlayerAngle } from "./math";
 
 const DEFAULT_SPRITE_SIZE = 64;
 const CENTRAL_RAY = WIDTH / 2 - 1;
@@ -31,23 +31,26 @@ export function addSpritesToDepthBuffer(depthBuffer: DepthBufferItem[]): DepthBu
 
         const spriteDistance = Math.sqrt(spriteX * spriteX + spriteY * spriteY);
 
-        let sprite2playerAngle = normalizeAngle(Math.atan2(spriteX, spriteY) - player.angle);
+        let sprite2playerAngle = normalizeSprite2PlayerAngle(
+            Math.atan2(spriteX, spriteY) - player.angle
+        );
+
+        const spriteIsOutOfView = Math.abs(sprite2playerAngle) > ((FOV / 2))
+        if (spriteIsOutOfView) {
+            return;
+        }
 
         const shiftRays = sprite2playerAngle / STEP_ANGLE;
         const spriteRay = CENTRAL_RAY - shiftRays;
-        
-        const perpendicularDistance = spriteDistance * Math.cos(sprite2playerAngle);
-        const spriteHeight = map.scale * 280 / perpendicularDistance;
-        const spriteScreenX = (WIDTH / 2) * (1 + Math.tan(sprite2playerAngle) / Math.tan(FOV / 2));
-
+        const spriteHeight = map.scale * 300 / spriteDistance;
         const spriteTexture = spriteTextures[sprite.texture];
 
         depthBuffer.push({
             type: 'sprite',
-            depth: perpendicularDistance,
+            depth: spriteDistance,
             ray: Math.floor(spriteRay),
             spriteTexture: spriteTexture,
-            spriteX: spriteScreenX,
+            spriteX: spriteX,
             spriteY: spriteY,
             spriteHeight: spriteHeight
         });

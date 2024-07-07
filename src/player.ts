@@ -2,6 +2,7 @@ import { map, showMap } from "./map";
 import { context } from "./canvas";
 import { isKeyPressed, getMouseDeltaX, requestPointerLock } from "./input";
 import { level } from "./map";
+import { normalizePlayerAngle } from "./math";
 
 const MAP_SPEED = (map.scale / 2) / 18;
 const PIVOT_SPEED = 0.05;
@@ -120,6 +121,6 @@ export function movePlayer() {
     }
 
     if (player.moveAngle) {
-        player.angle += PIVOT_SPEED * player.moveAngle;
+        player.angle = normalizePlayerAngle(player.angle + PIVOT_SPEED * player.moveAngle);
     }
 }
