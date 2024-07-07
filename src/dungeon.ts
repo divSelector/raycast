@@ -1,3 +1,7 @@
+// import { map } from "./map";
+// import { Sprite } from "./sprite";
+
+
 // const WIDTH = 32; // Width of the maze
 // const HEIGHT = 32; // Height of the maze
 // const WALL_TYPES = [4,5]; // Different wall types
@@ -75,4 +79,34 @@
 //     return maze;
 // }
 
+// const DEFAULT_SPRITE_SIZE = 64;
+
+// // export const dungeonSprites: Sprite[] = [
+// //     { x: map.scale * 5, y: map.scale * 5, texture: 0, width: DEFAULT_SPRITE_SIZE, height: DEFAULT_SPRITE_SIZE }
+// // ];
+
+
+// function placeBarrelsInMaze(maze: number[], width: number, height: number): Sprite[] {
+//     const sprites: Sprite[] = [];
+//     for (let y = 0; y < height; y++) {
+//         for (let x = 0; x < width; x++) {
+//             let idx = y * width + x;
+//             if (maze[idx] === EMPTY_SPACE) {
+//                 if (Math.random() < 0.5) {
+//                     sprites.push({
+//                         x: x * map.scale,
+//                         y: y * map.scale,
+//                         texture: 0, // Replace with actual texture index
+//                         width: DEFAULT_SPRITE_SIZE,
+//                         height: DEFAULT_SPRITE_SIZE
+//                     });
+//                 }
+//             }
+//         }
+//     }
+//     return sprites;
+// }
+
+
 // export const level = generateMaze(WIDTH, HEIGHT);
+// export const dungeonSprites = placeBarrelsInMaze(level, WIDTH, HEIGHT, );

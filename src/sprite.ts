@@ -6,10 +6,10 @@ import { DepthBufferItem, depthBufferTypeGuard } from "./raycaster";
 import { WIDTH, STEP_ANGLE, FOV, HEIGHT, torchRange } from "./constants";
 import { normalizeSprite2PlayerAngle } from "./math";
 
-const DEFAULT_SPRITE_SIZE = 64;
+
 const CENTRAL_RAY = WIDTH / 2 - 1;
 
-interface Sprite {
+export interface Sprite {
     x: number;
     y: number;
     width: number;
@@ -17,12 +17,8 @@ interface Sprite {
     texture: number;
 }
 
-const spritesData: Sprite[] = [
-    { x: map.scale * 5, y: map.scale * 5, texture: 0, width: DEFAULT_SPRITE_SIZE, height: DEFAULT_SPRITE_SIZE }
-];
 
-
-export function addSpritesToDepthBuffer(depthBuffer: DepthBufferItem[]): DepthBufferItem[] {
+export function addSpritesToDepthBuffer(spritesData: Sprite[], depthBuffer: DepthBufferItem[]): DepthBufferItem[] {
 
     spritesData.forEach(sprite => {
 
@@ -35,7 +31,7 @@ export function addSpritesToDepthBuffer(depthBuffer: DepthBufferItem[]): DepthBu
             Math.atan2(spriteX, spriteY) - player.angle
         );
 
-        const spriteIsOutOfView = Math.abs(sprite2playerAngle) > ((FOV / 2))
+        const spriteIsOutOfView = Math.abs(sprite2playerAngle) > ((FOV / 2)) + 20;
         if (spriteIsOutOfView) {
             return;
         }
@@ -80,7 +76,7 @@ export function drawSprite(item: DepthBufferItem) {
             context.drawImage(
                 item.spriteTexture, 
                 map.offsetX + item.ray - Math.floor(item.spriteHeight / 2), 
-                map.offsetY + (HEIGHT / 2) - (item.spriteHeight / 2) + 10, 
+                map.offsetY + (HEIGHT / 2) - (item.spriteHeight / 2), 
                 item.spriteHeight, 
                 item.spriteHeight
             );

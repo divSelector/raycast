@@ -1,5 +1,5 @@
 import { player } from "./player";
-import { level } from "./map";
+import { level, dungeonSprites } from "./map";
 import { addSpritesToDepthBuffer } from "./sprite";
 import { WIDTH, FOV, STEP_ANGLE } from "./constants";
 import { map } from "./map";
@@ -174,7 +174,7 @@ export function getDepthBufferByRayCast(): DepthBufferItem[] {
         currentAngle -= STEP_ANGLE;
     }
 
-    depthBuffer = addSpritesToDepthBuffer(depthBuffer);
+    depthBuffer = addSpritesToDepthBuffer(dungeonSprites, depthBuffer);
 
     return depthBuffer;
 }
