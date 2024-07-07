@@ -8,3 +8,6 @@ export const MAP_SIZE = 32;
 export const MAP_SCALE = 63;
 export const MINIMAP_SCALE = 5;
 export const MAP_RANGE = MAP_SIZE * MAP_SCALE;
+
+export const torchRange = 600;
+export const torchIntensity = 0.9; 

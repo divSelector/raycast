@@ -3,7 +3,7 @@ import { player } from "./player";
 import { context } from "./canvas";
 import { spriteTextures } from "./graphics";
 import { DepthBufferItem, depthBufferTypeGuard } from "./raycaster";
-import { MAP_SCALE, WIDTH, STEP_ANGLE, FOV, HEIGHT } from "./constants";
+import { MAP_SCALE, WIDTH, STEP_ANGLE, FOV, HEIGHT, torchIntensity, torchRange } from "./constants";
 import { normalizeAngle } from "./math";
 
 const DEFAULT_SPRITE_SIZE = 64;
@@ -60,12 +60,30 @@ export function addSpritesToDepthBuffer(depthBuffer: DepthBufferItem[]): DepthBu
 
 export function drawSprite(item: DepthBufferItem) {
     if (depthBufferTypeGuard.isSprite(item)) {
-        context.drawImage(
-            item.spriteTexture, 
-            map.offsetX + item.ray - Math.floor(item.spriteHeight / 2), 
-            map.offsetY + (HEIGHT / 2) - (item.spriteHeight / 2) + 10, 
-            item.spriteHeight, 
-            item.spriteHeight
-        );
+        const normalizedDistance = Math.min(item.depth / torchRange, 1);
+        const attenuationFactor = 1 - normalizedDistance;
+        const lightLevel = 2.4 * attenuationFactor;
+
+        context.save();
+
+        const opacityPercentage = (1 - lightLevel) * 100;
+        if (opacityPercentage > 60) {
+            context.filter = `opacity(${opacityPercentage}%)`;
+        }
+
+        context.globalAlpha = lightLevel;
+
+        if (opacityPercentage <= 99) {
+            context.drawImage(
+                item.spriteTexture, 
+                map.offsetX + item.ray - Math.floor(item.spriteHeight / 2), 
+                map.offsetY + (HEIGHT / 2) - (item.spriteHeight / 2) + 10, 
+                item.spriteHeight, 
+                item.spriteHeight
+            );
+        }
+
+        context.restore();
+        context.filter = 'none';
     }
 }

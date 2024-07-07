@@ -3,16 +3,14 @@ import { walls } from "./graphics";
 import { map } from "./map";
 import { drawSprite } from "./sprite";
 import { DepthBufferItem, getDepthBufferByRayCast, depthBufferTypeGuard } from "./raycaster";
-import { MAP_SCALE, HEIGHT, WIDTH } from "./constants";
+import { MAP_SCALE, HEIGHT, WIDTH, torchIntensity, torchRange  } from "./constants";
+
 
 export const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 export const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 
 const SCALE = 0.23;
-
-const torchRange = 600;
-const torchIntensity = 0.9; 
 const LIGHTING_OVERLAY_ALPHA = 0.4;
 
 
