@@ -1,12 +1,13 @@
 import { map } from "./map";
 import { player } from "./player";
-import { context, canvas } from "./canvas";
+import { context } from "./canvas";
 import { spriteTextures } from "./graphics";
 import { DepthBufferItem, depthBufferTypeGuard } from "./raycaster";
 import { MAP_SCALE, WIDTH, STEP_ANGLE, FOV, HEIGHT } from "./constants";
+import { normalizeAngle } from "./math";
 
 const DEFAULT_SPRITE_SIZE = 64;
-const CENTRAL_RAY = Math.floor(WIDTH / 2) - 1;
+const CENTRAL_RAY = WIDTH / 2 - 1;
 
 interface Sprite {
     x: number;
@@ -30,32 +31,23 @@ export function addSpritesToDepthBuffer(depthBuffer: DepthBufferItem[]): DepthBu
 
         const spriteDistance = Math.sqrt(spriteX * spriteX + spriteY * spriteY);
 
-        let sprite2playerAngle = Math.atan2(spriteX, spriteY) - player.angle;
-
-        if (sprite2playerAngle > Math.PI) {
-            sprite2playerAngle -= 2 * Math.PI;
-        } else if (sprite2playerAngle <= -Math.PI) {
-            sprite2playerAngle += 2 * Math.PI;
-        }
-
-        if (Math.abs(sprite2playerAngle) > ((FOV / 2))) {
-            return;
-        }
+        let sprite2playerAngle = normalizeAngle(Math.atan2(spriteX, spriteY) - player.angle);
 
         const shiftRays = sprite2playerAngle / STEP_ANGLE;
-
         const spriteRay = CENTRAL_RAY - shiftRays;
         
-        const spriteHeight = MAP_SCALE * 300 / spriteDistance;
+        const perpendicularDistance = spriteDistance * Math.cos(sprite2playerAngle);
+        const spriteHeight = MAP_SCALE * 280 / perpendicularDistance;
+        const spriteScreenX = (WIDTH / 2) * (1 + Math.tan(sprite2playerAngle) / Math.tan(FOV / 2));
 
         const spriteTexture = spriteTextures[sprite.texture];
 
         depthBuffer.push({
             type: 'sprite',
-            depth: spriteDistance,
+            depth: perpendicularDistance,
             ray: Math.floor(spriteRay),
             spriteTexture: spriteTexture,
-            spriteX: spriteX,
+            spriteX: spriteScreenX,
             spriteY: spriteY,
             spriteHeight: spriteHeight
         });

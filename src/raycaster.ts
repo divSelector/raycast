@@ -115,7 +115,7 @@ function calculateHorizontalIntersection(sinAngle: number, cosAngle: number): Ra
 }
 
 
-export function getDepthBufferFromRayCast(): DepthBufferItem[] {
+export function getDepthBufferByRayCast(): DepthBufferItem[] {
     let currentAngle = player.angle + (FOV / 2);
 
     let depthBuffer: DepthBufferItem[] = [];

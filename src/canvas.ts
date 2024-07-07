@@ -2,7 +2,7 @@ import { backgrounds } from "./graphics";
 import { walls } from "./graphics";
 import { map } from "./map";
 import { drawSprite } from "./sprite";
-import { DepthBufferItem, getDepthBufferFromRayCast, depthBufferTypeGuard } from "./raycaster";
+import { DepthBufferItem, getDepthBufferByRayCast, depthBufferTypeGuard } from "./raycaster";
 import { MAP_SCALE, HEIGHT, WIDTH } from "./constants";
 
 export const canvas = document.querySelector('canvas') as HTMLCanvasElement;
@@ -94,7 +94,7 @@ function drawLightingCanvasOverlay(alpha: number) {
 
 
 export function drawCamera() {
-    const depthBuffer = getDepthBufferFromRayCast();
+    const depthBuffer = getDepthBufferByRayCast();
     depthBuffer.sort((a, b) => b.depth - a.depth);
 
     for (const item of depthBuffer) {
