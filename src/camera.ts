@@ -1,13 +1,14 @@
 import { WIDTH, HEIGHT, context } from "./canvas";
 import { walls } from "./graphics";
-import { MAP_SCALE, MAP_SIZE, MAP_RANGE, MINIMAP_SCALE, map } from "./map";
+import { MAP_SCALE, MAP_SIZE, MAP_RANGE, map } from "./map";
 import { player } from "./player";
-import { level } from "./dungeon";
+import { level } from "./map";
+import { drawSprite, addSpritesToDepthBuffer } from "./sprite";
 
 export const DOUBLE_PI = Math.PI * 2;
 export const FOV = Math.PI / 3;
 
-const STEP_ANGLE = FOV / WIDTH;
+export const STEP_ANGLE = FOV / WIDTH;
 const TEXTURED_WALLS_ENABLED = true;
 
 const torchRange = 600;
@@ -19,6 +20,30 @@ interface RayIntersection {
     y: number;
     depth: number;
     texture: number;
+}
+
+export interface DepthBufferItem {
+    type: 'textureWall' | 'colorWall' | 'sprite';
+    depth: number;
+    ray: number;
+    wallHeight?: number;                  // For walls
+    closestIntersection?: RayIntersection // for walls
+    textureIndex?: number;                // For texture walls
+    textureOffset?: number;               // For texture walls
+    color?: string;                       // For color walls
+    spriteTexture?: HTMLImageElement;     // For sprites
+    spriteX?: number;                     // For sprites
+    spriteY?: number;                     // For sprites
+    spriteHeight?: number;                // For sprites
+    
+}
+
+function isDepthBufferItemTextureWall(item: DepthBufferItem): item is DepthBufferItem & { textureIndex: number; textureOffset: number; wallHeight: number; closestIntersection: RayIntersection; } {
+    return item.type === 'textureWall' && item.textureIndex !== undefined && item.textureOffset !== undefined && item.wallHeight !== undefined && item.closestIntersection !== undefined;
+}
+
+function isDepthBufferItemColorWall(item: DepthBufferItem): item is DepthBufferItem & { color: string; wallHeight: number; closestIntersection: RayIntersection } {
+    return item.type === 'colorWall' && item.color !== undefined && item.wallHeight !== undefined && item.closestIntersection !== undefined;
 }
 
 function calculateVerticalIntersection(sinAngle: number, cosAngle: number): RayIntersection {
@@ -87,42 +112,45 @@ function calculateHorizontalIntersection(sinAngle: number, cosAngle: number): Ra
     return { x: rayEndX, y: rayEndY, depth, texture };
 }
 
-function drawRectangleWalls(vI: RayIntersection, hI: RayIntersection, ray: number, wallHeight: number) {
-    context.fillStyle = vI.depth < hI.depth
-        ? '#aaa'
-        : '#555';
-    context.fillRect(
-        map.offsetX + ray, 
-        map.offsetY + (HEIGHT / 2 - wallHeight / 2), 
-        1, 
-        wallHeight
-    );
+function drawColorWall(item: DepthBufferItem) {
+    if (isDepthBufferItemColorWall(item)) {
+        context.fillStyle = item.color;
+        context.fillRect(
+            map.offsetX + item.ray, 
+            map.offsetY + (HEIGHT / 2 - item.wallHeight / 2), 
+            1, 
+            item.wallHeight
+        );
+        drawDistantWallLighting(item);
+    }
 }
 
-function drawTextureWalls(textureIndex: number, textureOffset: number, ray: number, wallHeight: number) {
-    context.drawImage(
-        walls[textureIndex - 1],
-        textureOffset,
-        0,
-        1,
-        MAP_SCALE,
-        map.offsetX + ray,
-        map.offsetY + HEIGHT / 2 - wallHeight / 2,
-        1,
-        wallHeight
-    );
+function drawTextureWall(item: DepthBufferItem) {
+    if (isDepthBufferItemTextureWall(item)) {
+        context.drawImage(
+            walls[item.textureIndex - 1],
+            item.textureOffset,
+            0,
+            1,
+            MAP_SCALE,
+            map.offsetX + item.ray,
+            map.offsetY + HEIGHT / 2 - item.wallHeight / 2,
+            1,
+            item.wallHeight
+        );
+        drawDistantWallLighting(item);
+    }
 }
 
-
-function drawDistantWallLighting(intersection: RayIntersection, ray: number, wallHeight: number) {
-
-    const normalizedDistance = Math.min(intersection.depth / torchRange, 1);
-    const attenuationFactor = 1 - normalizedDistance;
-    const lightLevel = torchIntensity * attenuationFactor;
-    
-    context.fillStyle = `rgba(0, 0, 0, ${1-lightLevel})`;
-    context.fillRect(map.offsetX + ray, map.offsetY + (HEIGHT / 2 - wallHeight / 2), 1, wallHeight);
-
+function drawDistantWallLighting(item: DepthBufferItem) {
+    if (isDepthBufferItemColorWall(item) || isDepthBufferItemTextureWall(item)) {
+        const normalizedDistance = Math.min(item.closestIntersection.depth / torchRange, 1);
+        const attenuationFactor = 1 - normalizedDistance;
+        const lightLevel = torchIntensity * attenuationFactor;
+        
+        context.fillStyle = `rgba(0, 0, 0, ${1-lightLevel})`;
+        context.fillRect(map.offsetX + item.ray, map.offsetY + (HEIGHT / 2 - item.wallHeight / 2), 1, item.wallHeight);
+    }
 }
 
 function drawLightingCanvasOverlay(alpha: number) {
@@ -130,9 +158,10 @@ function drawLightingCanvasOverlay(alpha: number) {
     context.fillRect(map.offsetX, map.offsetY, WIDTH, HEIGHT);
 }
 
-export function drawCamera() {
-
+function getDepthBufferFromRayCast(): DepthBufferItem[] {
     let currentAngle = player.angle + (FOV / 2);
+
+    let depthBuffer: DepthBufferItem[] = [];
 
     for (let ray = 0; ray < WIDTH; ray++) {
         const sinAngle = Math.sin(currentAngle);
@@ -159,17 +188,64 @@ export function drawCamera() {
                 ? verticalIntersection.texture 
                 : horizontalIntersection.texture;
 
-            drawTextureWalls(textureIndex, textureOffset, ray, wallHeight);
+            depthBuffer.push({
+                type: 'textureWall',
+                depth: depth,
+                ray: ray,
+                wallHeight: wallHeight,
+                textureIndex: textureIndex,
+                textureOffset: textureOffset,
+                closestIntersection: closestIntersection
+            });
 
         } else {
-            drawRectangleWalls(verticalIntersection, horizontalIntersection, ray, wallHeight);
-        }
 
-        drawDistantWallLighting(closestIntersection, ray, wallHeight);
+            const wallColor = verticalIntersection.depth < horizontalIntersection.depth 
+                ? '#aaa'
+                : '#555';
+
+            depthBuffer.push({
+                type: 'colorWall',
+                depth: depth,
+                ray: ray,
+                wallHeight: wallHeight,
+                color: wallColor,
+                closestIntersection: closestIntersection
+            });
+        }
 
         currentAngle -= STEP_ANGLE;
     }
 
-    drawLightingCanvasOverlay(LIGHTING_OVERLAY_ALPHA);
+    depthBuffer = addSpritesToDepthBuffer(depthBuffer);
 
+    return depthBuffer;
+}
+
+export function drawCamera() {
+
+    const depthBuffer = getDepthBufferFromRayCast();
+
+    depthBuffer.sort((a, b) => b.depth - a.depth);
+
+    for (const item of depthBuffer) {
+
+        switch (item.type) {
+
+            case 'textureWall':
+                drawTextureWall(item);
+                break;
+
+            case 'colorWall':
+                drawColorWall(item);
+                break;
+
+            case 'sprite': 
+                drawSprite(item)
+                break;
+
+        }
+    }
+
+    drawLightingCanvasOverlay(LIGHTING_OVERLAY_ALPHA);
 }

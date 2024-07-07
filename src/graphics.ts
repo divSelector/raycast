@@ -12,10 +12,11 @@ import wall10 from './assets/walls/10.png';
 import wall11 from './assets/walls/11.png';
 import wall12 from './assets/walls/12.png';
 import wall13 from './assets/walls/13.png';
-
+import barrel from './assets/sprite/barrel1.png'
 
 export const backgrounds: HTMLImageElement[] = [];
 export const walls: HTMLImageElement[] = [];
+export const spriteTextures: HTMLImageElement[] = [];
 
 const bgSources = [bg0];
 
@@ -24,6 +25,7 @@ bgSources.forEach(src => {
     img.src = src;
     backgrounds.push(img);
 });
+
 
 const wallSources = [
   wall1, wall2, wall3, wall4, 
@@ -37,4 +39,13 @@ wallSources.forEach(src => {
   img.src = src;
   walls.push(img);
 });
+
+const spriteSources = [barrel];
+
+spriteSources.forEach(src => {
+  const img = new Image();
+  img.src = src;
+  spriteTextures.push(img);
+});
+
 
