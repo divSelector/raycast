@@ -11,7 +11,8 @@ const keyMappings: KeyMapping = {
     down:     's',
     left:     'a',
     right:    'd',
-    minimap:  'm'
+    minimap:  'm',
+    fire:     'mouse0'
 };
 
 const keyState: KeyState = {};
@@ -27,6 +28,19 @@ document.onkeyup = function(event: KeyboardEvent) {
     keyState[key] = false;
     keyPressed[key] = false;
 }
+
+document.onmousedown = function (event: MouseEvent) {
+    if (event.button === 0) {
+        keyState['mouse0'] = true;
+    }
+};
+
+document.onmouseup = function (event: MouseEvent) {
+    if (event.button === 0) {
+        keyState['mouse0'] = false;
+        keyPressed['mouse0'] = false;
+    }
+};
 
 export function isKeyPressed(action: string): boolean {
     const key = keyMappings[action];

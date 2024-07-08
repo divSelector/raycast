@@ -1,7 +1,7 @@
 import { map } from "./map";
 import { player } from "./player";
 import { context } from "./canvas";
-import { spriteTextures } from "./graphics";
+import { barrelTextures } from "./graphics";
 import { DepthBufferItem, depthBufferTypeGuard } from "./raycaster";
 import { WIDTH, STEP_ANGLE, FOV, HEIGHT, torchRange } from "./constants";
 import { normalizeSprite2PlayerAngle } from "./math";
@@ -39,7 +39,7 @@ export function addSpritesToDepthBuffer(spritesData: Sprite[], depthBuffer: Dept
         const shiftRays = sprite2playerAngle / STEP_ANGLE;
         const spriteRay = CENTRAL_RAY - shiftRays;
         const spriteHeight = map.scale * 300 / spriteDistance;
-        const spriteTexture = spriteTextures[sprite.texture];
+        const spriteTexture = barrelTextures[sprite.texture];
 
         depthBuffer.push({
             type: 'sprite',

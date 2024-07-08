@@ -6,9 +6,9 @@ import { drawMiniMapPlayer, movePlayer } from './player';
 
 function gameLoop() {
 
-  resizeCanvas();
-
   updateFPS();
+
+  resizeCanvas();
 
   drawBackground();
 
