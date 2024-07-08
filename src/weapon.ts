@@ -4,7 +4,6 @@ import { context, canvas } from "./canvas";
 interface AnimationState {
     currentFrame: number;
     animationDirection: number;
-    totalFrames: number;
     frameDelay: number;
     lastFrameTime: number;
     frameInterval: number;
@@ -13,44 +12,45 @@ interface AnimationState {
 const crowbarState: AnimationState = {
     currentFrame: 0,
     animationDirection: 1,
-    totalFrames: crowbarTextures.length - 1,
-    frameDelay: 600, // Number of animation frames to wait before changing the texture frame
-    lastFrameTime: 0, // Timestamp of the last frame update
-    frameInterval: 1000 / 25, // Target frame interval (60 FPS)
+    frameDelay: 600,
+    lastFrameTime: 0,
+    frameInterval: 1000 / 25,
 };
 
 
-export function drawWeapon(state: AnimationState): void {
-    if (state.currentFrame >= 0 && state.currentFrame < state.totalFrames) {
-        const weaponWidth = crowbarTextures[state.currentFrame].width;
-        const weaponHeight = crowbarTextures[state.currentFrame].height;
+export function drawWeapon(state: AnimationState, weaponTextures: HTMLImageElement[]): void {
+    const totalFrames = weaponTextures.length - 1;
+    if (state.currentFrame >= 0 && state.currentFrame < totalFrames) {
+        const weaponWidth = weaponTextures[state.currentFrame].width;
+        const weaponHeight = weaponTextures[state.currentFrame].height;
 
         context.drawImage(
-            crowbarTextures[state.currentFrame], 
+            weaponTextures[state.currentFrame], 
             canvas.width / 2 - weaponWidth / 2,
             canvas.height - weaponHeight
         );
     }
 }
 
-function animateWeapon(timestamp: number, state: AnimationState): void {
+function animateWeapon(timestamp: number, state: AnimationState, weaponTextures: HTMLImageElement[]): void {
     const elapsed = timestamp - state.lastFrameTime;
+    const totalFrames = weaponTextures.length - 1;
 
     if (elapsed > state.frameInterval) {
         state.lastFrameTime = timestamp - (elapsed % state.frameInterval);
 
         state.currentFrame += state.animationDirection;
 
-        if (state.currentFrame >= state.totalFrames || state.currentFrame < 0) {
-            state.animationDirection *= -1; // Reverse the direction
-            state.currentFrame += state.animationDirection; // Ensure it doesn't get stuck at the boundaries
+        if (state.currentFrame >= totalFrames || state.currentFrame < 0) {
+            state.animationDirection *= -1;
+            state.currentFrame += state.animationDirection;
         }
     }
 
-    drawWeapon(state);
-    requestAnimationFrame((ts) => animateWeapon(ts, state));
+    drawWeapon(state, crowbarTextures);
+    requestAnimationFrame((ts) => animateWeapon(ts, state, crowbarTextures));
 }
 
 
 
-export const debugCrowbar = () => animateWeapon(0, crowbarState);
+export const debugCrowbar = () => animateWeapon(0, crowbarState, crowbarTextures);
