@@ -2,6 +2,8 @@ import { isKeyPressed, getMouseDeltaX } from "./input";
 import { map } from "./map";
 import { normalizePlayerAngle } from "./math";
 import { MAP_SCALE } from "./constants";
+import { getState } from "./state";
+import { Sprite } from "./sprites";
 
 
 const MAP_SPEED = (MAP_SCALE / 2) / 18;
@@ -77,34 +79,57 @@ function calculateMovementOffsets(): MovementVectors {
 }
 
 
-function calculateTargetPositions(offsets: MovementVectors): MovementVectors {
+function calculateTargetForWallCollision(offsets: MovementVectors): MovementVectors {
     const proximityLimit = 10;
-    const mapSize = map.size;
 
-    const targetX = Math.floor(player.y / MAP_SCALE) * mapSize + Math.floor((player.x + offsets.x * player.moveX * proximityLimit) / MAP_SCALE);
-    const targetY = Math.floor((player.y + offsets.y * player.moveY * proximityLimit) / MAP_SCALE) * mapSize + Math.floor(player.x / MAP_SCALE);
+    const targetX = Math.floor(player.y / MAP_SCALE) * map.size + Math.floor((player.x + offsets.x * player.moveX * proximityLimit) / MAP_SCALE);
+    const targetY = Math.floor((player.y + offsets.y * player.moveY * proximityLimit) / MAP_SCALE) * map.size + Math.floor(player.x / MAP_SCALE);
 
-    const strafeTargetX = Math.floor((player.y + offsets.strafeY * player.strafeX * proximityLimit) / MAP_SCALE) * mapSize + Math.floor(player.x / MAP_SCALE);
-    const strafeTargetY = Math.floor(player.y / MAP_SCALE) * mapSize + Math.floor((player.x + offsets.strafeX * player.strafeX * proximityLimit) / MAP_SCALE);
+    const strafeTargetX = Math.floor((player.y + offsets.strafeY * player.strafeX * proximityLimit) / MAP_SCALE) * map.size + Math.floor(player.x / MAP_SCALE);
+    const strafeTargetY = Math.floor(player.y / MAP_SCALE) * map.size + Math.floor((player.x + offsets.strafeX * player.strafeX * proximityLimit) / MAP_SCALE);
 
     return { x: targetX, y: targetY, strafeX: strafeTargetX, strafeY: strafeTargetY };
 }
 
 
-function updatePlayerPosition(offsets: MovementVectors, targets: MovementVectors): void {
-    if (player.moveX && map.level[targets.x] === 0) {
+function calculateTargetForSpriteCollision(offsets: MovementVectors): MovementVectors {
+    const x = player.x + offsets.x * player.moveX;
+    const y = player.y + offsets.y * player.moveY;
+    const strafeX = player.x + offsets.strafeX * player.strafeX;
+    const strafeY = player.y + offsets.strafeY * player.strafeX;
+    return { x, y, strafeX, strafeY }
+}
+
+
+function isPositionOccupiedBySprite(x: number, y: number, sprites: Sprite[]): boolean {
+    const proximityThreshold = 32;
+
+    for (const sprite of sprites) {
+        const distance = Math.sqrt((sprite.x - x) ** 2 + (sprite.y - y) ** 2);
+        if (distance < proximityThreshold) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+function updatePlayerPosition(offsets: MovementVectors, wallTargets: MovementVectors, spriteTargets: MovementVectors, sprites: Sprite[]): void {
+
+
+    if (player.moveX && map.level[wallTargets.x] === 0 && !isPositionOccupiedBySprite(spriteTargets.x, player.y, sprites)) {
         player.x += offsets.x * player.moveX;
     }
 
-    if (player.moveY && map.level[targets.y] === 0) {
+    if (player.moveY && map.level[wallTargets.y] === 0 && !isPositionOccupiedBySprite(player.x, spriteTargets.y, sprites)) {
         player.y += offsets.y * player.moveY;
     }
 
-    if (player.strafeX && map.level[targets.strafeX] === 0) {
+    if (player.strafeX && map.level[wallTargets.strafeX] === 0 && !isPositionOccupiedBySprite(player.x, spriteTargets.strafeY, sprites)) {
         player.y += offsets.strafeY * player.strafeX;
     }
 
-    if (player.strafeX && map.level[targets.strafeY] === 0) {
+    if (player.strafeX && map.level[wallTargets.strafeY] === 0 && !isPositionOccupiedBySprite(spriteTargets.strafeX, player.y, sprites)) {
         player.x += offsets.strafeX * player.strafeX;
     }
 
@@ -117,8 +142,11 @@ function updatePlayerPosition(offsets: MovementVectors, targets: MovementVectors
 export function movePlayer() {
     handlePlayerInput();
 
-    const offsets = calculateMovementOffsets();
-    const targets = calculateTargetPositions(offsets);
+    const barrels = getState().barrels
 
-    updatePlayerPosition(offsets, targets);
+    const offsets = calculateMovementOffsets();
+    const wallTargets = calculateTargetForWallCollision(offsets);
+    const spriteTargets = calculateTargetForSpriteCollision(offsets);
+
+    updatePlayerPosition(offsets, wallTargets, spriteTargets, barrels);
 }
