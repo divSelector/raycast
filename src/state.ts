@@ -3,15 +3,13 @@ import { DestructableSprite } from "./sprites";
 
 interface GameState {
   barrels: DestructableSprite[];
+  addBarrel: (sprite: DestructableSprite) => void;
+  updateBarrel: (index: number, newProps: Partial<DestructableSprite>) => void;
 }
-
-const state: GameState = {
-  barrels: []
-};
 
 export const getState = () => state;
 
-export const addBarrel = (sprite: DestructableSprite) => {
+const addBarrel = (sprite: DestructableSprite) => {
   state.barrels.push({
     type: sprite.type,
     x: sprite.x,
@@ -25,9 +23,16 @@ export const addBarrel = (sprite: DestructableSprite) => {
   });
 };
 
-export const updateBarrel = (index: number, newProps: Partial<DestructableSprite>) => {
+const updateBarrel = (index: number, newProps: Partial<DestructableSprite>) => {
   const barrel = state.barrels[index];
   if (barrel) {
     state.barrels[index] = { ...barrel, ...newProps };
   }
 };
+
+
+const state: GameState = {
+  barrels: [],
+  addBarrel,
+  updateBarrel
+}

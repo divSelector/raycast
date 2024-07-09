@@ -3,10 +3,10 @@ import { renderFPS, updateFPS } from './display';
 import { resizeCanvas, drawBackground, drawCanvasClamp, drawCamera } from './canvas';
 import { movePlayer } from './player';
 import { drawMiniMap } from './minimap';
-import { loadMap } from './map';
+import { loadMapToState } from './map';
 import { mazeLevel } from './levels';
 
-loadMap(mazeLevel);
+loadMapToState(mazeLevel);
 
 function gameLoop() {
 
