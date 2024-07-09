@@ -2,7 +2,7 @@ import { player } from "./player";
 import { map } from "./map";
 import { context, canvas } from "./canvas";
 import { isKeyJustPressed } from "./input";
-import { WIDTH, HEIGHT } from "./constants";
+import { WIDTH, HEIGHT, MAP_SCALE } from "./constants";
 
 
 function updateMiniMapOffsets() {
@@ -12,8 +12,8 @@ function updateMiniMapOffsets() {
 
 
 function updatePlayerMapOffsets() {
-    player.mapX = (player.x / map.scale) * map.minimapScale + map.offsetX;
-    player.mapY = (player.y / map.scale) * map.minimapScale + map.offsetY;
+    player.mapX = (player.x / MAP_SCALE) * map.minimapScale + map.offsetX;
+    player.mapY = (player.y / MAP_SCALE) * map.minimapScale + map.offsetY;
 }
 
 

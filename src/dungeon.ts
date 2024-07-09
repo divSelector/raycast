@@ -82,7 +82,7 @@
 // const DEFAULT_SPRITE_SIZE = 64;
 
 // // export const dungeonSprites: Sprite[] = [
-// //     { x: map.scale * 5, y: map.scale * 5, texture: 0, width: DEFAULT_SPRITE_SIZE, height: DEFAULT_SPRITE_SIZE }
+// //     { x: MAP_SCALE * 5, y: MAP_SCALE * 5, texture: 0, width: DEFAULT_SPRITE_SIZE, height: DEFAULT_SPRITE_SIZE }
 // // ];
 
 
@@ -94,8 +94,8 @@
 //             if (maze[idx] === EMPTY_SPACE) {
 //                 if (Math.random() < 0.5) {
 //                     sprites.push({
-//                         x: x * map.scale,
-//                         y: y * map.scale,
+//                         x: x * MAP_SCALE,
+//                         y: y * MAP_SCALE,
 //                         texture: 0, // Replace with actual texture index
 //                         width: DEFAULT_SPRITE_SIZE,
 //                         height: DEFAULT_SPRITE_SIZE

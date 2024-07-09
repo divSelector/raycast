@@ -1,6 +1,5 @@
-import { map } from "./map";
 import { barrelTextures } from "./graphics";
-import { DEFAULT_SPRITE_SIZE } from "./constants";
+import { DEFAULT_SPRITE_SIZE, MAP_SCALE } from "./constants";
 
 
 export interface Sprite {
@@ -20,8 +19,8 @@ export interface DestructableSprite extends Sprite {
 
 const defaultBarrelSprite: DestructableSprite = {
     type: 'barrel', 
-    x: map.scale * 5, 
-    y: map.scale * 5, 
+    x: MAP_SCALE * 5, 
+    y: MAP_SCALE * 5, 
     texture: 0, 
     textures: barrelTextures,
     width: DEFAULT_SPRITE_SIZE, 
@@ -31,5 +30,5 @@ const defaultBarrelSprite: DestructableSprite = {
 }
 
 export const barrelSpritesForLevel: DestructableSprite[] = [
-    { ...defaultBarrelSprite, x: map.scale * 5, y: map.scale * 5 }
+    { ...defaultBarrelSprite, x: MAP_SCALE * 5, y: MAP_SCALE * 5 }
 ];

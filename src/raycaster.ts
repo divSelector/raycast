@@ -1,6 +1,6 @@
 import { player } from "./player";
-import { barrelSpritesForLevel, Sprite } from "./sprite";
-import { WIDTH, FOV, STEP_ANGLE } from "./constants";
+import { Sprite } from "./sprites";
+import { WIDTH, FOV, STEP_ANGLE, MAP_SCALE } from "./constants";
 import { map } from "./map";
 import { normalizeSprite2PlayerAngle } from "./math";
 import { barrelTextures } from "./graphics";
@@ -57,20 +57,20 @@ function calculateVerticalIntersection(sinAngle: number, cosAngle: number): RayI
     let rayEndY: number = 0;
     let depth = Infinity;
     let texture: number = 0;
-    const mapRange = map.scale * map.size;
+    const mapRange = MAP_SCALE * map.size;
 
     let directionX = sinAngle > 0 ? 1 : -1;
     let initialX = directionX > 0
-        ? Math.floor(player.x / map.scale) * map.scale + map.scale
-        : Math.floor(player.x / map.scale) * map.scale;
+        ? Math.floor(player.x / MAP_SCALE) * MAP_SCALE + MAP_SCALE
+        : Math.floor(player.x / MAP_SCALE) * MAP_SCALE;
 
-    for (let offset = 0; offset < mapRange; offset += map.scale) {
+    for (let offset = 0; offset < mapRange; offset += MAP_SCALE) {
         depth = (initialX - player.x) / sinAngle;
         rayEndY = player.y + depth * cosAngle;
         rayEndX = initialX;
         
-        let mapTargetX = Math.floor(rayEndX / map.scale);
-        let mapTargetY = Math.floor(rayEndY / map.scale);
+        let mapTargetX = Math.floor(rayEndX / MAP_SCALE);
+        let mapTargetY = Math.floor(rayEndY / MAP_SCALE);
         if (directionX < 0) mapTargetX += directionX;
         
         let targetSquare = mapTargetY * map.size + mapTargetX;
@@ -80,7 +80,7 @@ function calculateVerticalIntersection(sinAngle: number, cosAngle: number): RayI
             break;
         }
 
-        initialX += directionX * map.scale;
+        initialX += directionX * MAP_SCALE;
     }
 
     return { x: rayEndX, y: rayEndY, depth, texture };
@@ -93,20 +93,20 @@ function calculateHorizontalIntersection(sinAngle: number, cosAngle: number): Ra
     let rayEndY: number = 0;
     let depth = Infinity;
     let texture: number = 0;
-    const mapRange = map.scale * map.size;
+    const mapRange = MAP_SCALE * map.size;
 
     let directionY = cosAngle > 0 ? 1 : -1;
     let initialY = directionY > 0
-        ? Math.floor(player.y / map.scale) * map.scale + map.scale
-        : Math.floor(player.y / map.scale) * map.scale;
+        ? Math.floor(player.y / MAP_SCALE) * MAP_SCALE + MAP_SCALE
+        : Math.floor(player.y / MAP_SCALE) * MAP_SCALE;
 
-    for (let offset = 0; offset < mapRange; offset += map.scale) {
+    for (let offset = 0; offset < mapRange; offset += MAP_SCALE) {
         depth = (initialY - player.y) / cosAngle;
         rayEndX = player.x + depth * sinAngle;
         rayEndY = initialY;
 
-        let mapTargetX = Math.floor(rayEndX / map.scale);
-        let mapTargetY = Math.floor(rayEndY / map.scale);
+        let mapTargetX = Math.floor(rayEndX / MAP_SCALE);
+        let mapTargetY = Math.floor(rayEndY / MAP_SCALE);
         if (directionY < 0) mapTargetY += directionY;
 
         let targetSquare = mapTargetY * map.size + mapTargetX;
@@ -116,7 +116,7 @@ function calculateHorizontalIntersection(sinAngle: number, cosAngle: number): Ra
             break;
         }
 
-        initialY += directionY * map.scale;
+        initialY += directionY * MAP_SCALE;
     }
 
     return { x: rayEndX, y: rayEndY, depth, texture };
@@ -140,14 +140,14 @@ export function getDepthBufferByRayCast(): DepthBufferItem[] {
             : horizontalIntersection;
 
         let depth = closestIntersection.depth * Math.cos(player.angle - currentAngle);
-        let wallHeight = map.scale * 280 / depth;
+        let wallHeight = MAP_SCALE * 280 / depth;
 
         if (TEXTURED_WALLS_ENABLED) {
             let textureOffset = verticalIntersection.depth < horizontalIntersection.depth 
                 ? verticalIntersection.y 
                 : horizontalIntersection.x;
 
-            textureOffset = textureOffset % map.scale;
+            textureOffset = textureOffset % MAP_SCALE;
 
             let textureIndex = verticalIntersection.depth < horizontalIntersection.depth 
                 ? verticalIntersection.texture 
@@ -181,7 +181,7 @@ export function getDepthBufferByRayCast(): DepthBufferItem[] {
         currentAngle -= STEP_ANGLE;
     }
 
-    depthBuffer = addSpritesToDepthBuffer(barrelSpritesForLevel, depthBuffer);
+    depthBuffer = addSpritesToDepthBuffer(map.sprites, depthBuffer);
 
     return depthBuffer;
 }
@@ -207,7 +207,7 @@ export function addSpritesToDepthBuffer(spritesData: Sprite[], depthBuffer: Dept
 
         const shiftRays = sprite2playerAngle / STEP_ANGLE;
         const spriteRay = CENTRAL_RAY - shiftRays;
-        const spriteHeight = map.scale * 300 / spriteDistance;
+        const spriteHeight = MAP_SCALE * 300 / spriteDistance;
         const spriteTexture = barrelTextures[sprite.texture];
 
         depthBuffer.push({

@@ -1,4 +1,4 @@
-import { DestructableSprite } from "./sprite";
+import { DestructableSprite } from "./sprites";
 
 
 interface GameState {
