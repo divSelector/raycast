@@ -1,5 +1,4 @@
 import { player } from "./player";
-import { level } from "./map";
 import { barrelSpritesForLevel, Sprite } from "./sprite";
 import { WIDTH, FOV, STEP_ANGLE } from "./constants";
 import { map } from "./map";
@@ -8,7 +7,6 @@ import { barrelTextures } from "./graphics";
 
 
 const TEXTURED_WALLS_ENABLED = true;
-const MAP_RANGE = map.scale * map.size;
 const CENTRAL_RAY = WIDTH / 2 - 1;
 
 
@@ -54,17 +52,19 @@ export const depthBufferTypeGuard = {
 
 
 function calculateVerticalIntersection(sinAngle: number, cosAngle: number): RayIntersection {
+    
     let rayEndX: number = 0; 
     let rayEndY: number = 0;
     let depth = Infinity;
     let texture: number = 0;
+    const mapRange = map.scale * map.size;
 
     let directionX = sinAngle > 0 ? 1 : -1;
     let initialX = directionX > 0
         ? Math.floor(player.x / map.scale) * map.scale + map.scale
         : Math.floor(player.x / map.scale) * map.scale;
 
-    for (let offset = 0; offset < MAP_RANGE; offset += map.scale) {
+    for (let offset = 0; offset < mapRange; offset += map.scale) {
         depth = (initialX - player.x) / sinAngle;
         rayEndY = player.y + depth * cosAngle;
         rayEndX = initialX;
@@ -74,9 +74,9 @@ function calculateVerticalIntersection(sinAngle: number, cosAngle: number): RayI
         if (directionX < 0) mapTargetX += directionX;
         
         let targetSquare = mapTargetY * map.size + mapTargetX;
-        if (targetSquare < 0 || targetSquare >= level.length) break;
-        if (level[targetSquare] !== 0) {
-            texture = level[targetSquare];
+        if (targetSquare < 0 || targetSquare >= map.level.length) break;
+        if (map.level[targetSquare] !== 0) {
+            texture = map.level[targetSquare];
             break;
         }
 
@@ -88,17 +88,19 @@ function calculateVerticalIntersection(sinAngle: number, cosAngle: number): RayI
 
 
 function calculateHorizontalIntersection(sinAngle: number, cosAngle: number): RayIntersection {
+
     let rayEndX: number = 0; 
     let rayEndY: number = 0;
     let depth = Infinity;
     let texture: number = 0;
+    const mapRange = map.scale * map.size;
 
     let directionY = cosAngle > 0 ? 1 : -1;
     let initialY = directionY > 0
         ? Math.floor(player.y / map.scale) * map.scale + map.scale
         : Math.floor(player.y / map.scale) * map.scale;
 
-    for (let offset = 0; offset < MAP_RANGE; offset += map.scale) {
+    for (let offset = 0; offset < mapRange; offset += map.scale) {
         depth = (initialY - player.y) / cosAngle;
         rayEndX = player.x + depth * sinAngle;
         rayEndY = initialY;
@@ -108,9 +110,9 @@ function calculateHorizontalIntersection(sinAngle: number, cosAngle: number): Ra
         if (directionY < 0) mapTargetY += directionY;
 
         let targetSquare = mapTargetY * map.size + mapTargetX;
-        if (targetSquare < 0 || targetSquare >= level.length) break;
-        if (level[targetSquare] !== 0) {
-            texture = level[targetSquare];
+        if (targetSquare < 0 || targetSquare >= map.level.length) break;
+        if (map.level[targetSquare] !== 0) {
+            texture = map.level[targetSquare];
             break;
         }
 

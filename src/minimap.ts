@@ -1,5 +1,5 @@
 import { player } from "./player";
-import { map, level } from "./map";
+import { map } from "./map";
 import { context, canvas } from "./canvas";
 import { isKeyJustPressed } from "./input";
 import { WIDTH, HEIGHT } from "./constants";
@@ -36,7 +36,8 @@ export function drawMiniMap() {
         for (let row = 0; row < map.size; row++) {
             for (let col = 0; col < map.size; col++) {
                 const square = row * map.size + col;
-                if (level[square]) {
+                if (!map.level) return;
+                if (map.level[square]) {
                     context.fillStyle = '#555';
                 } else {
                     context.fillStyle = '#aaa';

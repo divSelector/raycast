@@ -12,7 +12,6 @@ export const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 const SCALE = 0.23;
 const LIGHTING_OVERLAY_ALPHA = 0.4;
 
-
 export function resizeCanvas() {
     canvas.width = window.innerWidth * SCALE;
     canvas.height = window.innerHeight * SCALE;

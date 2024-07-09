@@ -1,7 +1,5 @@
-
-import { context } from "./canvas";
 import { isKeyPressed, getMouseDeltaX, requestPointerLock } from "./input";
-import { level, map } from "./map";
+import { map } from "./map";
 import { normalizePlayerAngle } from "./math";
 
 
@@ -78,20 +76,21 @@ export function movePlayer() {
     const strafeTargetX = Math.floor((player.y + strafeOffsetY * player.strafeX * proximityLimit) / map.scale) * map.size + Math.floor(player.x / map.scale);
     const strafeTargetY = Math.floor(player.y / map.scale) * map.size + Math.floor((player.x + strafeOffsetX * player.strafeX * proximityLimit) / map.scale);
 
+    if (!map.level) return;
 
-    if (player.moveX && level[targetX] == 0) {
+    if (player.moveX && map.level[targetX] == 0) {
         player.x += playerOffsetX * player.moveX;
     }
     
-    if (player.moveY && level[targetY] == 0) {
+    if (player.moveY && map.level[targetY] == 0) {
         player.y += playerOffsetY * player.moveY;
     }
 
-    if (player.strafeX && level[strafeTargetX] == 0) {
+    if (player.strafeX && map.level[strafeTargetX] == 0) {
         player.y += strafeOffsetY * player.strafeX;
     }
 
-    if (player.strafeX && level[strafeTargetY] == 0) {
+    if (player.strafeX && map.level[strafeTargetY] == 0) {
         player.x += strafeOffsetX * player.strafeX;
     }
 
