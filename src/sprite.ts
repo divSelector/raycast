@@ -1,15 +1,16 @@
-import { map } from "./map";
 import { player } from "./player";
+import { map } from "./map";
 import { context } from "./canvas";
 import { barrelTextures } from "./graphics";
 import { DepthBufferItem, depthBufferTypeGuard } from "./raycaster";
-import { WIDTH, STEP_ANGLE, FOV, HEIGHT, torchRange } from "./constants";
+import { WIDTH, STEP_ANGLE, FOV, HEIGHT, torchRange, DEFAULT_SPRITE_SIZE } from "./constants";
 import { normalizeSprite2PlayerAngle } from "./math";
 
 
 const CENTRAL_RAY = WIDTH / 2 - 1;
 
 export interface Sprite {
+    type: string | null;
     x: number;
     y: number;
     width: number;
@@ -17,10 +18,41 @@ export interface Sprite {
     texture: number;
 }
 
+interface DestructableSprite extends Sprite {
+    hitPoints: number;
+    maxHitPoints: number;
+    textures: HTMLImageElement[];
+}
+
+const defaultBarrelSprite: DestructableSprite = {
+    type: 'barrel', 
+    x: map.scale * 5, 
+    y: map.scale * 5, 
+    texture: 0, 
+    textures: barrelTextures,
+    width: DEFAULT_SPRITE_SIZE, 
+    height: DEFAULT_SPRITE_SIZE,
+    hitPoints: 3,
+    maxHitPoints: 3,
+}
+
+export const barrelSpritesForLevel: DestructableSprite[] = [
+    { ...defaultBarrelSprite, x: map.scale * 5, y: map.scale * 5 }
+];
+
 
 export function addSpritesToDepthBuffer(spritesData: Sprite[], depthBuffer: DepthBufferItem[]): DepthBufferItem[] {
 
     spritesData.forEach(sprite => {
+
+        switch (sprite.type) {
+            case null:
+                console.log("No Sprite Type");
+                break;
+            case "barrel":
+                console.log("Its a barrel");
+                break;
+        }
 
         const spriteX = sprite.x - player.x;
         const spriteY = sprite.y - player.y;
