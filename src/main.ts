@@ -4,9 +4,9 @@ import { resizeCanvas, drawBackground, drawCanvasClamp, drawCamera } from './can
 import { movePlayer } from './player';
 import { drawMiniMap } from './minimap';
 import { loadMap } from './map';
-import { level } from './levels';
+import { mazeLevel } from './levels';
 
-loadMap(level);
+loadMap(mazeLevel);
 
 function gameLoop() {
 

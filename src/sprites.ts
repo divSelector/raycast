@@ -17,7 +17,7 @@ export interface DestructableSprite extends Sprite {
     textures: HTMLImageElement[];
 }
 
-const defaultBarrelSprite: DestructableSprite = {
+export const defaultBarrelSprite: DestructableSprite = {
     type: 'barrel', 
     x: MAP_SCALE * 5, 
     y: MAP_SCALE * 5, 

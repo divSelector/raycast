@@ -1,17 +1,19 @@
 import { Sprite, barrelSpritesForLevel } from "./sprites";
+import { maze, mazeBarrels } from "./procgen";
+import { MAP_SCALE } from "./constants";
 
 type LevelValues = 0 | 1 | 2 | 3 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
-export type LevelArray = LevelValues[];
+export type LevelArea = LevelValues[];
 
 export interface Level {
-    area: LevelArray;
+    area: LevelArea;
     size: number;
     playerStartX: number;
     playerStartY: number;
     sprites: Sprite[];
 }
 
-const levelArray: LevelArray = [
+const levelArea: LevelArea = [
     2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
     2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -46,7 +48,7 @@ const levelArray: LevelArray = [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 ];
 
-export const initialLevelArray: LevelArray = [
+export const initialLevelArea: LevelArea = [
     1,1,1,1,1,1,1,1,1,
     1,0,0,0,0,0,0,0,1,
     1,0,0,0,0,0,0,0,1,
@@ -59,9 +61,17 @@ export const initialLevelArray: LevelArray = [
 ]
 
 export const level: Level = {
-    area: levelArray,
+    area: levelArea,
     size: 32,
     playerStartX: 200,
     playerStartY: 200,
     sprites: barrelSpritesForLevel
+}
+
+export const mazeLevel: Level = {
+    area: maze,
+    size: 32,
+    playerStartX: MAP_SCALE + 10,
+    playerStartY: MAP_SCALE + 10,
+    sprites: mazeBarrels
 }
