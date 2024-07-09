@@ -1,12 +1,12 @@
-import { isKeyPressed, getMouseDeltaX, requestPointerLock } from "./input";
+import { isKeyPressed, getMouseDeltaX } from "./input";
 import { map } from "./map";
 import { normalizePlayerAngle } from "./math";
 import { MAP_SCALE } from "./constants";
 
+
 const MAP_SPEED = (MAP_SCALE / 2) / 18;
 const PIVOT_SPEED = 0.05;
 
-document.addEventListener('click', requestPointerLock);
 
 interface Player {
     x: number;
@@ -19,6 +19,14 @@ interface Player {
     moveAngle: number;
     strafeX: number;
 }
+
+interface MovementVectors {
+    x: number;
+    y: number;
+    strafeX: number;
+    strafeY: number;
+}
+
 
 export const player: Player = {
     x: MAP_SCALE + 10,
@@ -33,7 +41,7 @@ export const player: Player = {
 };
 
 
-function updatePlayerMovement() {
+function handlePlayerInput() {
     player.moveX = 0;
     player.moveY = 0;
     player.moveAngle = 0;
@@ -58,43 +66,59 @@ function updatePlayerMovement() {
     player.moveAngle = -deltaX * rotationSpeed;
 }
 
-export function movePlayer() {
 
-    updatePlayerMovement();
+function calculateMovementOffsets(): MovementVectors {
+    return {
+        x: Math.sin(player.angle) * MAP_SPEED,
+        y: Math.cos(player.angle) * MAP_SPEED,
+        strafeX: Math.sin(player.angle + Math.PI / 2) * MAP_SPEED,
+        strafeY: Math.cos(player.angle + Math.PI / 2) * MAP_SPEED,
+    };
+}
 
-    const playerOffsetX = Math.sin(player.angle) * MAP_SPEED;
-    const playerOffsetY = Math.cos(player.angle) * MAP_SPEED;
 
-    const strafeOffsetX = Math.sin(player.angle + Math.PI / 2) * MAP_SPEED;
-    const strafeOffsetY = Math.cos(player.angle + Math.PI / 2) * MAP_SPEED;
-
+function calculateTargetPositions(offsets: MovementVectors): MovementVectors {
     const proximityLimit = 10;
+    const mapSize = map.size;
 
-    const targetX = Math.floor(player.y / MAP_SCALE) * map.size + Math.floor((player.x + playerOffsetX * player.moveX * proximityLimit) / MAP_SCALE);
-    const targetY = Math.floor((player.y + playerOffsetY * player.moveY * proximityLimit) / MAP_SCALE) * map.size + Math.floor(player.x / MAP_SCALE);
+    const targetX = Math.floor(player.y / MAP_SCALE) * mapSize + Math.floor((player.x + offsets.x * player.moveX * proximityLimit) / MAP_SCALE);
+    const targetY = Math.floor((player.y + offsets.y * player.moveY * proximityLimit) / MAP_SCALE) * mapSize + Math.floor(player.x / MAP_SCALE);
 
-    const strafeTargetX = Math.floor((player.y + strafeOffsetY * player.strafeX * proximityLimit) / MAP_SCALE) * map.size + Math.floor(player.x / MAP_SCALE);
-    const strafeTargetY = Math.floor(player.y / MAP_SCALE) * map.size + Math.floor((player.x + strafeOffsetX * player.strafeX * proximityLimit) / MAP_SCALE);
+    const strafeTargetX = Math.floor((player.y + offsets.strafeY * player.strafeX * proximityLimit) / MAP_SCALE) * mapSize + Math.floor(player.x / MAP_SCALE);
+    const strafeTargetY = Math.floor(player.y / MAP_SCALE) * mapSize + Math.floor((player.x + offsets.strafeX * player.strafeX * proximityLimit) / MAP_SCALE);
 
-    if (!map.level) return;
+    return { x: targetX, y: targetY, strafeX: strafeTargetX, strafeY: strafeTargetY };
+}
 
-    if (player.moveX && map.level[targetX] == 0) {
-        player.x += playerOffsetX * player.moveX;
-    }
-    
-    if (player.moveY && map.level[targetY] == 0) {
-        player.y += playerOffsetY * player.moveY;
-    }
 
-    if (player.strafeX && map.level[strafeTargetX] == 0) {
-        player.y += strafeOffsetY * player.strafeX;
+function updatePlayerPosition(offsets: MovementVectors, targets: MovementVectors): void {
+    if (player.moveX && map.level[targets.x] === 0) {
+        player.x += offsets.x * player.moveX;
     }
 
-    if (player.strafeX && map.level[strafeTargetY] == 0) {
-        player.x += strafeOffsetX * player.strafeX;
+    if (player.moveY && map.level[targets.y] === 0) {
+        player.y += offsets.y * player.moveY;
+    }
+
+    if (player.strafeX && map.level[targets.strafeX] === 0) {
+        player.y += offsets.strafeY * player.strafeX;
+    }
+
+    if (player.strafeX && map.level[targets.strafeY] === 0) {
+        player.x += offsets.strafeX * player.strafeX;
     }
 
     if (player.moveAngle) {
         player.angle = normalizePlayerAngle(player.angle + PIVOT_SPEED * player.moveAngle);
     }
+}
+
+
+export function movePlayer() {
+    handlePlayerInput();
+
+    const offsets = calculateMovementOffsets();
+    const targets = calculateTargetPositions(offsets);
+
+    updatePlayerPosition(offsets, targets);
 }

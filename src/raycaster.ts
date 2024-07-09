@@ -220,10 +220,6 @@ export function addSpritesToDepthBuffer(spritesData: Sprite[], depthBuffer: Dept
             spriteHeight: spriteHeight
         });
 
-        // if (addSpriteToState) {
-        //     addSpriteToState({...defaultBarrelSprite, ...sprite})
-        // }
-
     });
 
     return depthBuffer;

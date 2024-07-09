@@ -15,8 +15,10 @@ const keyMappings: KeyMapping = {
     fire:     'mouse0'
 };
 
+
 const keyState: KeyState = {};
 const keyPressed: KeyState = {};
+
 
 document.onkeydown = function(event: KeyboardEvent) {
     const key = event.key.toLowerCase();
@@ -28,6 +30,7 @@ document.onkeyup = function(event: KeyboardEvent) {
     keyState[key] = false;
     keyPressed[key] = false;
 }
+
 
 document.onmousedown = function (event: MouseEvent) {
     if (event.button === 0) {
@@ -41,6 +44,7 @@ document.onmouseup = function (event: MouseEvent) {
         keyPressed['mouse0'] = false;
     }
 };
+
 
 export function isKeyPressed(action: string): boolean {
     const key = keyMappings[action];
@@ -70,6 +74,9 @@ export function getMouseDeltaX(): number {
     mouseDeltaX = 0;
     return deltaX;
 }
+
+
+document.addEventListener('click', requestPointerLock);
 
 export function requestPointerLock() {
     document.body.requestPointerLock();

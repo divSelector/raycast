@@ -4,6 +4,7 @@ import { map } from "./map";
 import { DepthBufferItem, getDepthBufferByRayCast, depthBufferTypeGuard } from "./raycaster";
 import { HEIGHT, WIDTH, torchIntensity, torchRange, MAP_SCALE  } from "./constants";
 import { debugCrowbar } from "./weapon";
+import { drawMiniMap } from "./minimap";
 
 export const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 export const context = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -12,13 +13,13 @@ export const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 const SCALE = 0.23;
 const LIGHTING_OVERLAY_ALPHA = 0.4;
 
-export function resizeCanvas() {
+function resizeCanvas() {
     canvas.width = window.innerWidth * SCALE;
     canvas.height = window.innerHeight * SCALE;
 }
 
 
-export function drawBackground() {
+function drawBackground() {
     context.drawImage(
         backgrounds[0], 
         canvas.width / 2 - Math.floor(WIDTH / 2),
@@ -27,7 +28,7 @@ export function drawBackground() {
 }
 
 
-export function drawCanvasClamp() {
+function drawCanvasClamp() {
     context.fillStyle = '#242424';
     // Prevents Wall Height From Extending Outside Canvas
     context.fillRect(0, 0, canvas.width, map.offsetY);
@@ -89,7 +90,7 @@ function drawLightingCanvasOverlay(alpha: number) {
 }
 
 
-export function drawCamera() {
+function drawCamera() {
     const depthBuffer = getDepthBufferByRayCast();
     depthBuffer.sort((a, b) => b.depth - a.depth);
 
@@ -140,4 +141,12 @@ export function drawSprite(item: DepthBufferItem) {
         context.restore();
         context.filter = 'none';
     }
+}
+
+export function drawGame() {
+    resizeCanvas();
+    drawBackground();
+    drawCamera();
+    drawMiniMap();
+    drawCanvasClamp();
 }
