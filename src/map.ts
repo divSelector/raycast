@@ -1,8 +1,3 @@
-import { canvas, context } from "./canvas";
-import { isKeyJustPressed } from "./input";
-import { WIDTH, HEIGHT } from "./constants";
-// import { player } from "./player";
-// This above import would cause things to break due to import dependency problems
 
 type LevelValues = 0 | 1 | 2 | 3 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 type LevelArray = LevelValues[];
@@ -62,44 +57,6 @@ export const map: Map = {
     level: undefined
 };
 
-function updateMiniMapOffsets() {
-    map.offsetX = Math.floor(canvas.width / 2) - WIDTH / 2;
-    map.offsetY = Math.floor(canvas.height / 2) - HEIGHT / 2;
-}
-
-function updateShowMiniMap() {
-    if (isKeyJustPressed('minimap')) {
-        if (map.showMinimap) {
-            map.showMinimap = false;
-        } else {
-            map.showMinimap = true;
-        }
-    }
-}
-
-export function drawMiniMap() {
-
-    updateShowMiniMap();
-    updateMiniMapOffsets();
-
-    if (map.showMinimap) {
-        for (let row = 0; row < map.size; row++) {
-            for (let col = 0; col < map.size; col++) {
-                const square = row * map.size + col;
-                if (level[square]) {
-                    context.fillStyle = '#555';
-                } else {
-                    context.fillStyle = '#aaa';
-                }
-                context.fillRect(
-                    map.offsetX + col * map.minimapScale, 
-                    map.offsetY + row * map.minimapScale, 
-                    map.minimapScale, map.minimapScale
-                )
-            }
-        }
-    }
-}
 
 
 // const MAZE_WIDTH = 32; // Width of the maze

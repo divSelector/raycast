@@ -34,33 +34,6 @@ export const player: Player = {
     strafeX: 0
 };
 
-function updatePlayerMapOffsets() {
-    player.mapX = (player.x / map.scale) * map.minimapScale + map.offsetX;
-    player.mapY = (player.y / map.scale) * map.minimapScale + map.offsetY;
-}
-
-export function drawMiniMapPlayer() {
-    updatePlayerMapOffsets();
-
-    if (map.showMinimap) {
-        context.fillStyle = 'Blue';
-        context.beginPath();
-        context.arc(player.mapX, player.mapY, 2, 0, Math.PI * 2);
-        context.fill();
-
-        context.strokeStyle = 'Blue';
-        context.lineWidth = 1;
-        const lineLength = 5;
-        context.beginPath();
-        context.moveTo(player.mapX, player.mapY);
-        context.lineTo(
-            player.mapX + Math.sin(player.angle) * lineLength,
-            player.mapY + Math.cos(player.angle) * lineLength
-        );
-        context.stroke();
-    }
-}
-
 
 function updatePlayerMovement() {
     player.moveX = 0;

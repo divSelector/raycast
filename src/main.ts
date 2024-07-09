@@ -1,8 +1,8 @@
 import './style.css'
 import { renderFPS, updateFPS } from './display';
 import { resizeCanvas, drawBackground, drawCanvasClamp, drawCamera } from './canvas';
-import { movePlayer, drawMiniMapPlayer } from './player';
-import { drawMiniMap } from './map';
+import { movePlayer } from './player';
+import { drawMiniMap } from './minimap';
 
 function gameLoop() {
 
@@ -15,8 +15,6 @@ function gameLoop() {
   drawCamera();
 
   drawMiniMap();
-
-  drawMiniMapPlayer();
 
   drawCanvasClamp();
 
