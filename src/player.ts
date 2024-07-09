@@ -1,15 +1,16 @@
-import { map, showMap } from "./map";
+
 import { context } from "./canvas";
 import { isKeyPressed, getMouseDeltaX, requestPointerLock } from "./input";
-import { level } from "./map";
+import { level, map } from "./map";
 import { normalizePlayerAngle } from "./math";
+
 
 const MAP_SPEED = (map.scale / 2) / 18;
 const PIVOT_SPEED = 0.05;
 
 document.addEventListener('click', requestPointerLock);
 
-interface PlayerIface {
+interface Player {
     x: number;
     y: number;
     angle: number;
@@ -21,7 +22,7 @@ interface PlayerIface {
     strafeX: number;
 }
 
-export const player: PlayerIface = {
+export const player: Player = {
     x: map.scale + 10,
     y: map.scale + 10,
     angle: Math.PI / 3,
@@ -41,7 +42,7 @@ function updatePlayerMapOffsets() {
 export function drawMiniMapPlayer() {
     updatePlayerMapOffsets();
 
-    if (showMap) {
+    if (map.showMinimap) {
         context.fillStyle = 'Blue';
         context.beginPath();
         context.arc(player.mapX, player.mapY, 2, 0, Math.PI * 2);
@@ -59,6 +60,7 @@ export function drawMiniMapPlayer() {
         context.stroke();
     }
 }
+
 
 function updatePlayerMovement() {
     player.moveX = 0;

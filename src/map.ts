@@ -1,9 +1,13 @@
 import { canvas, context } from "./canvas";
 import { isKeyJustPressed } from "./input";
 import { WIDTH, HEIGHT } from "./constants";
-import { Sprite } from "./sprite";
+// import { player } from "./player";
+// This above import would cause things to break due to import dependency problems
 
-export const level = [
+type LevelValues = 0 | 1 | 2 | 3 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+type LevelArray = LevelValues[];
+
+export const level: LevelArray = [
     2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
     2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -36,24 +40,26 @@ export const level = [
     1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
     1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  ];
+];
 
-export let showMap: boolean = false;
-
-export interface MapIface {
+export interface Map {
     offsetX: number;
     offsetY: number;
     scale: number;
     size: number;
+    showMinimap: boolean;
     minimapScale: number;
+    level?: LevelArray[];
 }
 
-export const map: MapIface = {
+export const map: Map = {
     offsetX: 0,
     offsetY: 0,
     scale: 63,
     size: 32,
-    minimapScale: 5
+    showMinimap: false,
+    minimapScale: 5,
+    level: undefined
 };
 
 function updateMiniMapOffsets() {
@@ -63,10 +69,10 @@ function updateMiniMapOffsets() {
 
 function updateShowMiniMap() {
     if (isKeyJustPressed('minimap')) {
-        if (showMap) {
-            showMap = false;
+        if (map.showMinimap) {
+            map.showMinimap = false;
         } else {
-            showMap = true;
+            map.showMinimap = true;
         }
     }
 }
@@ -76,7 +82,7 @@ export function drawMiniMap() {
     updateShowMiniMap();
     updateMiniMapOffsets();
 
-    if (showMap) {
+    if (map.showMinimap) {
         for (let row = 0; row < map.size; row++) {
             for (let col = 0; col < map.size; col++) {
                 const square = row * map.size + col;
