@@ -1,7 +1,6 @@
 import { backgrounds } from "./graphics";
 import { walls } from "./graphics";
 import { map } from "./map";
-import { drawSprite } from "./sprite";
 import { DepthBufferItem, getDepthBufferByRayCast, depthBufferTypeGuard } from "./raycaster";
 import { HEIGHT, WIDTH, torchIntensity, torchRange  } from "./constants";
 import { debugCrowbar } from "./weapon";
@@ -112,4 +111,34 @@ export function drawCamera() {
     debugCrowbar();
 
     drawLightingCanvasOverlay(LIGHTING_OVERLAY_ALPHA);
+}
+
+export function drawSprite(item: DepthBufferItem) {
+    if (depthBufferTypeGuard.isSprite(item)) {
+        const normalizedDistance = Math.min(item.depth / torchRange, 1);
+        const attenuationFactor = 1 - normalizedDistance;
+        const lightLevel = 2.4 * attenuationFactor;
+
+        context.save();
+
+        const opacityPercentage = (1 - lightLevel) * 100;
+        if (opacityPercentage > 60) {
+            context.filter = `opacity(${opacityPercentage}%)`;
+        }
+
+        context.globalAlpha = lightLevel;
+
+        if (opacityPercentage <= 99) {
+            context.drawImage(
+                item.spriteTexture, 
+                map.offsetX + item.ray - Math.floor(item.spriteHeight / 2), 
+                map.offsetY + (HEIGHT / 2) - (item.spriteHeight / 2), 
+                item.spriteHeight, 
+                item.spriteHeight
+            );
+        }
+
+        context.restore();
+        context.filter = 'none';
+    }
 }

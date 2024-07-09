@@ -1,11 +1,15 @@
 import { player } from "./player";
 import { level } from "./map";
-import { addSpritesToDepthBuffer, barrelSpritesForLevel } from "./sprite";
+import { barrelSpritesForLevel, Sprite } from "./sprite";
 import { WIDTH, FOV, STEP_ANGLE } from "./constants";
 import { map } from "./map";
+import { normalizeSprite2PlayerAngle } from "./math";
+import { barrelTextures } from "./graphics";
+
 
 const TEXTURED_WALLS_ENABLED = true;
 const MAP_RANGE = map.scale * map.size;
+const CENTRAL_RAY = WIDTH / 2 - 1;
 
 
 export interface RayIntersection {
@@ -176,6 +180,49 @@ export function getDepthBufferByRayCast(): DepthBufferItem[] {
     }
 
     depthBuffer = addSpritesToDepthBuffer(barrelSpritesForLevel, depthBuffer);
+
+    return depthBuffer;
+}
+
+
+export function addSpritesToDepthBuffer(spritesData: Sprite[], depthBuffer: DepthBufferItem[]): DepthBufferItem[] {
+
+    spritesData.forEach(sprite => {
+
+        const spriteX = sprite.x - player.x;
+        const spriteY = sprite.y - player.y;
+
+        const spriteDistance = Math.sqrt(spriteX * spriteX + spriteY * spriteY);
+
+        let sprite2playerAngle = normalizeSprite2PlayerAngle(
+            Math.atan2(spriteX, spriteY) - player.angle
+        );
+
+        const spriteIsOutOfView = Math.abs(sprite2playerAngle) > ((FOV / 2)) + 20;
+        if (spriteIsOutOfView) {
+            return;
+        }
+
+        const shiftRays = sprite2playerAngle / STEP_ANGLE;
+        const spriteRay = CENTRAL_RAY - shiftRays;
+        const spriteHeight = map.scale * 300 / spriteDistance;
+        const spriteTexture = barrelTextures[sprite.texture];
+
+        depthBuffer.push({
+            type: 'sprite',
+            depth: spriteDistance,
+            ray: Math.floor(spriteRay),
+            spriteTexture: spriteTexture,
+            spriteX: spriteX,
+            spriteY: spriteY,
+            spriteHeight: spriteHeight
+        });
+
+        // if (addSpriteToState) {
+        //     addSpriteToState({...defaultBarrelSprite, ...sprite})
+        // }
+
+    });
 
     return depthBuffer;
 }
