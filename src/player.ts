@@ -114,27 +114,34 @@ function isPositionOccupiedBySprite(x: number, y: number, sprites: Sprite[]): bo
 }
 
 
-function checkCollisionAndDoVectorMovement(
-    movePos: number, wallTarget: number, 
-    targetX: number, targetY: number, sprites: Sprite[], 
-    playerPos: number, offsetPos: number
-): number {
-
+function checkCollision(movePos: number, wallTarget: number, targetX: number, targetY: number, sprites: Sprite[], ): boolean {
     if (movePos && map.level[wallTarget] === 0 && !isPositionOccupiedBySprite(targetX, targetY, sprites)) {
-        playerPos += offsetPos * movePos;
+        return true;
+    } else {
+        return false;
     }
-    return playerPos;
 }
 
 
 function updatePlayerPosition(offsets: MovementVectors, wallTargets: MovementVectors, spriteTargets: MovementVectors, sprites: Sprite[]): void {
     
-    player.x = checkCollisionAndDoVectorMovement(player.moveX, wallTargets.x, spriteTargets.x, player.y, sprites, player.x, offsets.x);
-    player.y = checkCollisionAndDoVectorMovement(player.moveY, wallTargets.y, player.x, spriteTargets.y, sprites, player.y, offsets.y);
+    const playerCanMoveX = () => checkCollision(player.moveX, wallTargets.x, spriteTargets.x, player.y, sprites);
+    const playerCanMoveY = () => checkCollision(player.moveY, wallTargets.y, player.x, spriteTargets.y, sprites);
+    const playerCanStrafeY = () =>  checkCollision(player.strafeX, wallTargets.strafeX, player.x, spriteTargets.strafeY, sprites);
+    const playerCanStrafeX = () => checkCollision(player.strafeX, wallTargets.strafeY, spriteTargets.strafeX, player.y, sprites);
 
-    player.y = checkCollisionAndDoVectorMovement(player.strafeX, wallTargets.strafeX, player.x, spriteTargets.strafeY, sprites, player.y, offsets.strafeY);
-    player.x = checkCollisionAndDoVectorMovement(player.strafeX, wallTargets.strafeY, spriteTargets.strafeX, player.y, sprites, player.x, offsets.strafeX);
-
+    if (playerCanMoveX()) {
+        player.x += offsets.x * player.moveX;
+    }
+    if (playerCanMoveY()) {
+        player.y += offsets.y * player.moveY;
+    }
+    if (playerCanStrafeY()) {
+        player.y += offsets.strafeY * player.strafeX;
+    }
+    if (playerCanStrafeX()) {
+        player.x += offsets.strafeX * player.strafeX;
+    }
     if (player.moveAngle) {
         player.angle = normalizePlayerAngle(player.angle + PIVOT_SPEED * player.moveAngle);
     }
