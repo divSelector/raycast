@@ -1,6 +1,14 @@
 import { crowbarTextures } from "./graphics";
 import { context, canvas } from "./canvas";
-import { isKeyJustPressed } from "./input";
+
+type WeaponType = "melee" | "ranged";
+
+export interface Weapon {
+    type: WeaponType;
+    damage: number;
+    animate: () => void;
+    draw: () => void;
+}
 
 interface AnimationState {
     currentFrame: number;
@@ -18,7 +26,8 @@ const crowbarState: AnimationState = {
     isAnimating: false
 };
 
-export function drawWeapon(state: AnimationState, weaponTextures: HTMLImageElement[]): void {
+
+function drawWeapon(state: AnimationState, weaponTextures: HTMLImageElement[]): void {
     const totalFrames = weaponTextures.length - 1;
     if (state.currentFrame >= 0 && state.currentFrame < totalFrames) {
         const weaponWidth = weaponTextures[state.currentFrame].width;
@@ -31,6 +40,7 @@ export function drawWeapon(state: AnimationState, weaponTextures: HTMLImageEleme
         );
     }
 }
+
 
 function animateWeapon(timestamp: number, state: AnimationState, weaponTextures: HTMLImageElement[]): void {
     const elapsed = timestamp - state.lastFrameTime;
@@ -55,11 +65,13 @@ function animateWeapon(timestamp: number, state: AnimationState, weaponTextures:
     }
 }
 
-export const debugCrowbar = () => {
-    if (isKeyJustPressed('fire')) {
+
+export const crowbar: Weapon = {
+    type: "melee",
+    damage: 1,
+    animate: () => {
         crowbarState.isAnimating = true;
         animateWeapon(0, crowbarState, crowbarTextures);
-    } else {
-        drawWeapon(crowbarState, crowbarTextures);
-    }
+    },
+    draw: () => drawWeapon(crowbarState, crowbarTextures)
 }

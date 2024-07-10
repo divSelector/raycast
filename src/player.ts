@@ -1,10 +1,10 @@
-import { isKeyPressed, getMouseDeltaX } from "./input";
+import { isKeyPressed, isKeyJustPressed, getMouseDeltaX } from "./input";
 import { map } from "./map";
 import { normalizePlayerAngle } from "./math";
 import { MAP_SCALE } from "./constants";
 import { getState } from "./state";
 import { Sprite } from "./sprites";
-
+import { crowbar, Weapon } from "./weapon";
 
 const MAP_SPEED = (MAP_SCALE / 2) / 18;
 const PIVOT_SPEED = 0.05;
@@ -20,6 +20,7 @@ interface Player {
     moveY: number;
     moveAngle: number;
     strafeX: number;
+    equippedWeapon: Weapon;
 }
 
 interface MovementVectors {
@@ -39,7 +40,8 @@ export const player: Player = {
     moveX: 0,
     moveY: 0,
     moveAngle: 0,
-    strafeX: 0
+    strafeX: 0,
+    equippedWeapon: crowbar,
 };
 
 
@@ -66,6 +68,12 @@ function handlePlayerInput() {
     const deltaX = getMouseDeltaX();
     const rotationSpeed = 0.045;
     player.moveAngle = -deltaX * rotationSpeed;
+
+    if (isKeyJustPressed('fire')) {
+        player.equippedWeapon.animate();
+    } else {
+        player.equippedWeapon.draw();
+    }
 }
 
 

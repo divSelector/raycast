@@ -1,6 +1,6 @@
 import './style.css'
 import { renderFPS, updateFPS } from './display';
-import { drawGame } from './canvas';
+import { drawGame, drawCanvasClamp } from './canvas';
 import { movePlayer } from './player';
 import { loadMapToState } from './map';
 import { mazeLevel } from './levels';
@@ -14,6 +14,8 @@ function gameLoop() {
   drawGame();
 
   movePlayer();
+
+  drawCanvasClamp();
 
   renderFPS();
 

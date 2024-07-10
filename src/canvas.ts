@@ -3,7 +3,6 @@ import { walls } from "./graphics";
 import { map } from "./map";
 import { DepthBufferItem, getDepthBufferByRayCast, depthBufferTypeGuard } from "./raycaster";
 import { HEIGHT, WIDTH, torchIntensity, torchRange, MAP_SCALE  } from "./constants";
-import { debugCrowbar } from "./weapon";
 import { drawMiniMap } from "./minimap";
 
 export const canvas = document.querySelector('canvas') as HTMLCanvasElement;
@@ -28,7 +27,7 @@ function drawBackground() {
 }
 
 
-function drawCanvasClamp() {
+export function drawCanvasClamp() {
     context.fillStyle = '#242424';
     // Prevents Wall Height From Extending Outside Canvas
     context.fillRect(0, 0, canvas.width, map.offsetY);
@@ -108,8 +107,6 @@ function drawCamera() {
         }
     }
 
-    debugCrowbar();
-
     drawLightingCanvasOverlay(LIGHTING_OVERLAY_ALPHA);
 }
 
@@ -148,5 +145,4 @@ export function drawGame() {
     drawBackground();
     drawCamera();
     drawMiniMap();
-    drawCanvasClamp();
 }
