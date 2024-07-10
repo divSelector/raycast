@@ -71,18 +71,25 @@ function handlePlayerInput() {
 
     if (isKeyJustPressed('fire')) {
         player.equippedWeapon.animate();
+        const barrels = getState().barrels
+        const hitSprite = checkForHit(barrels);
+        if (hitSprite) {
+            // Handle what happens when the crowbar hits a sprite
+            console.log('Hit sprite:', hitSprite);
+            // Example: reduce sprite's health, destroy it, etc.
+        }
     } else {
         player.equippedWeapon.draw();
     }
 }
 
 
-function calculateMovementOffsets(): MovementVectors {
+function calculatePlayerOffsets(multiplier: number = MAP_SPEED): MovementVectors {
     return {
-        x: Math.sin(player.angle) * MAP_SPEED,
-        y: Math.cos(player.angle) * MAP_SPEED,
-        strafeX: Math.sin(player.angle + Math.PI / 2) * MAP_SPEED,
-        strafeY: Math.cos(player.angle + Math.PI / 2) * MAP_SPEED,
+        x: Math.sin(player.angle) * multiplier,
+        y: Math.cos(player.angle) * multiplier,
+        strafeX: Math.sin(player.angle + Math.PI / 2) * multiplier,
+        strafeY: Math.cos(player.angle + Math.PI / 2) * multiplier,
     };
 }
 
@@ -109,21 +116,20 @@ function calculateTargetForSpriteCollision(offsets: MovementVectors): MovementVe
 }
 
 
-function isPositionOccupiedBySprite(x: number, y: number, sprites: Sprite[]): boolean {
-    const proximityThreshold = 32;
+function getSpriteAtPosition(x: number, y: number, sprites: Sprite[], proximityThreshold: number = 32): Sprite | null {
 
     for (const sprite of sprites) {
         const distance = Math.sqrt((sprite.x - x) ** 2 + (sprite.y - y) ** 2);
         if (distance < proximityThreshold) {
-            return true;
+            return sprite;
         }
     }
-    return false;
+    return null;
 }
 
 
 function checkCollision(movePos: number, wallTarget: number, targetX: number, targetY: number, sprites: Sprite[], ): boolean {
-    if (movePos && map.level[wallTarget] === 0 && !isPositionOccupiedBySprite(targetX, targetY, sprites)) {
+    if (movePos && map.level[wallTarget] === 0 && !getSpriteAtPosition(targetX, targetY, sprites)) {
         return true;
     } else {
         return false;
@@ -161,9 +167,21 @@ export function movePlayer() {
 
     const barrels = getState().barrels
 
-    const offsets = calculateMovementOffsets();
+    const offsets = calculatePlayerOffsets();
     const wallTargets = calculateTargetForWallCollision(offsets);
     const spriteTargets = calculateTargetForSpriteCollision(offsets);
 
     updatePlayerPosition(offsets, wallTargets, spriteTargets, barrels);
+}
+
+
+function checkForHit(sprites: Sprite[]): Sprite | null {
+    const offsets: MovementVectors = calculatePlayerOffsets(player.equippedWeapon.range);
+
+    const targetPositions = calculateTargetForSpriteCollision(offsets);
+
+    const hitSprite = getSpriteAtPosition(targetPositions.x, targetPositions.y, sprites) ||
+                      getSpriteAtPosition(targetPositions.strafeX, targetPositions.strafeY, sprites);
+
+    return hitSprite;
 }

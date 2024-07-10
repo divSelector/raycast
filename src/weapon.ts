@@ -6,6 +6,7 @@ type WeaponType = "melee" | "ranged";
 export interface Weapon {
     type: WeaponType;
     damage: number;
+    range: number;
     animate: () => void;
     draw: () => void;
 }
@@ -65,10 +66,10 @@ function animateWeapon(timestamp: number, state: AnimationState, weaponTextures:
     }
 }
 
-
 export const crowbar: Weapon = {
     type: "melee",
     damage: 1,
+    range: 12,
     animate: () => {
         crowbarState.isAnimating = true;
         animateWeapon(0, crowbarState, crowbarTextures);
