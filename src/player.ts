@@ -114,24 +114,26 @@ function isPositionOccupiedBySprite(x: number, y: number, sprites: Sprite[]): bo
 }
 
 
+function checkCollisionAndDoVectorMovement(
+    movePos: number, wallTarget: number, 
+    targetX: number, targetY: number, sprites: Sprite[], 
+    playerPos: number, offsetPos: number
+): number {
+
+    if (movePos && map.level[wallTarget] === 0 && !isPositionOccupiedBySprite(targetX, targetY, sprites)) {
+        playerPos += offsetPos * movePos;
+    }
+    return playerPos;
+}
+
+
 function updatePlayerPosition(offsets: MovementVectors, wallTargets: MovementVectors, spriteTargets: MovementVectors, sprites: Sprite[]): void {
+    
+    player.x = checkCollisionAndDoVectorMovement(player.moveX, wallTargets.x, spriteTargets.x, player.y, sprites, player.x, offsets.x);
+    player.y = checkCollisionAndDoVectorMovement(player.moveY, wallTargets.y, player.x, spriteTargets.y, sprites, player.y, offsets.y);
 
-
-    if (player.moveX && map.level[wallTargets.x] === 0 && !isPositionOccupiedBySprite(spriteTargets.x, player.y, sprites)) {
-        player.x += offsets.x * player.moveX;
-    }
-
-    if (player.moveY && map.level[wallTargets.y] === 0 && !isPositionOccupiedBySprite(player.x, spriteTargets.y, sprites)) {
-        player.y += offsets.y * player.moveY;
-    }
-
-    if (player.strafeX && map.level[wallTargets.strafeX] === 0 && !isPositionOccupiedBySprite(player.x, spriteTargets.strafeY, sprites)) {
-        player.y += offsets.strafeY * player.strafeX;
-    }
-
-    if (player.strafeX && map.level[wallTargets.strafeY] === 0 && !isPositionOccupiedBySprite(spriteTargets.strafeX, player.y, sprites)) {
-        player.x += offsets.strafeX * player.strafeX;
-    }
+    player.y = checkCollisionAndDoVectorMovement(player.strafeX, wallTargets.strafeX, player.x, spriteTargets.strafeY, sprites, player.y, offsets.strafeY);
+    player.x = checkCollisionAndDoVectorMovement(player.strafeX, wallTargets.strafeY, spriteTargets.strafeX, player.y, sprites, player.x, offsets.strafeX);
 
     if (player.moveAngle) {
         player.angle = normalizePlayerAngle(player.angle + PIVOT_SPEED * player.moveAngle);
