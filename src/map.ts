@@ -3,6 +3,7 @@ import { LevelArea, Level, initialLevelArea } from "./levels";
 import { player } from "./player";
 import { getState } from "./state";
 
+
 export interface Map {
     offsetX: number;
     offsetY: number;
@@ -12,6 +13,7 @@ export interface Map {
     minimapScale: number;
     level: LevelArea;
 }
+
 
 export const map: Map = {
     offsetX: 0,
@@ -31,7 +33,7 @@ export function loadMap(level: Level) {
     for (let sprite of level.sprites) {
         switch (sprite.type) {
             case "barrel":
-                state.addBarrel(sprite.id, sprite as DestructableSprite);
+                state.storeBarrel(sprite.id, sprite as DestructableSprite);
         }
     }
 

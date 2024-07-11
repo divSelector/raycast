@@ -75,15 +75,14 @@ function handlePlayerInput() {
         const barrels = getState().barrels
         let hitSprite = checkForHit(barrels);
         if (hitSprite) {
-            console.log('Hit sprite:', hitSprite);
             switch (hitSprite.type) {
                 case "barrel":
                     let damagedSprite = hitSprite as DestructableSprite;
-                    damagedSprite.hitPoints -= player.equippedWeapon.damage;
-                    damagedSprite.texture += 1;
-                    console.log('damagedSprite.id: ', damagedSprite.id)
-                    state.addBarrel(damagedSprite.id, damagedSprite)
-                    console.log("state: ", state.barrels[damagedSprite.id])
+                    if (damagedSprite.hitPoints > 1) {
+                        damagedSprite.hitPoints -= player.equippedWeapon.damage;
+                        damagedSprite.texture += 1;
+                    }
+                    state.storeBarrel(damagedSprite.id, damagedSprite)
                     break;
             }
         }
@@ -138,7 +137,13 @@ function getSpriteAtPosition(x: number, y: number, sprites: Sprite[], proximityT
 
 
 function checkCollision(movePos: number, wallTarget: number, targetX: number, targetY: number, sprites: Sprite[], ): boolean {
-    if (movePos && map.level[wallTarget] === 0 && !getSpriteAtPosition(targetX, targetY, sprites)) {
+
+    const sprite = getSpriteAtPosition(targetX, targetY, sprites) as DestructableSprite;
+    if (sprite && sprite.hitPoints <= 1 && sprite.type == 'barrel') {
+        return true;
+    }
+
+    if (movePos && map.level[wallTarget] === 0 && !sprite) {
         return true;
     } else {
         return false;

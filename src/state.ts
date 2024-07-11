@@ -2,12 +2,12 @@ import { DestructableSprite } from "./sprites";
 
 interface GameState {
   barrels: { [id: number]: DestructableSprite };
-  addBarrel: (id: number, sprite: DestructableSprite) => void;
+  storeBarrel: (id: number, sprite: DestructableSprite) => void;
 }
 
 export const getState = () => state;
 
-const addBarrel = (id: number, sprite: Partial<DestructableSprite>) => {
+const storeBarrel = (id: number, sprite: Partial<DestructableSprite>) => {
   const existingBarrel = state.barrels[id];
   if (existingBarrel) {
     state.barrels[id] = { ...existingBarrel, ...sprite };
@@ -29,5 +29,5 @@ const addBarrel = (id: number, sprite: Partial<DestructableSprite>) => {
 
 const state: GameState = {
   barrels: [],
-  addBarrel
+  storeBarrel
 }

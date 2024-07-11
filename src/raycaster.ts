@@ -216,7 +216,7 @@ export function addSpritesToDepthBuffer(spritesData: {[id: number ]: Destructabl
 
         switch (sprite.type) {
             case "barrel":
-                state.addBarrel(sprite.id, sprite as DestructableSprite) 
+                state.storeBarrel(sprite.id, sprite as DestructableSprite) 
             
                 break;
         }
