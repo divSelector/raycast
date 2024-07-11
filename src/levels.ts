@@ -68,6 +68,14 @@ export const level: Level = {
     sprites: barrelSpritesForLevel
 }
 
+export const initialLevel: Level = {
+    area: initialLevelArea,
+    size: 9,
+    playerStartX: 200,
+    playerStartY: 200,
+    sprites: barrelSpritesForLevel
+}
+
 export const mazeLevel: Level = {
     area: maze,
     size: 32,

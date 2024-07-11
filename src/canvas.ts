@@ -4,10 +4,12 @@ import { map } from "./map";
 import { DepthBufferItem, getDepthBufferByRayCast, depthBufferTypeGuard } from "./raycaster";
 import { HEIGHT, WIDTH, torchIntensity, torchRange, MAP_SCALE  } from "./constants";
 import { drawMiniMap } from "./minimap";
+import { getState } from "./state";
 
 export const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 export const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 
+const state = getState();
 
 const SCALE = 0.23;
 const LIGHTING_OVERLAY_ALPHA = 0.4;
@@ -112,31 +114,42 @@ function drawCamera() {
 
 export function drawSprite(item: DepthBufferItem) {
     if (depthBufferTypeGuard.isSprite(item)) {
-        const normalizedDistance = Math.min(item.depth / torchRange, 1);
-        const attenuationFactor = 1 - normalizedDistance;
-        const lightLevel = 2.4 * attenuationFactor;
 
-        context.save();
+        if (item && item.spriteId) {
+            const spriteFromState = state.barrels[item.spriteId]
 
-        const opacityPercentage = (1 - lightLevel) * 100;
-        if (opacityPercentage > 60) {
-            context.filter = `opacity(${opacityPercentage}%)`;
+            // console.log(spriteFromState)
+
+            const normalizedDistance = Math.min(item.depth / torchRange, 1);
+            const attenuationFactor = 1 - normalizedDistance;
+            const lightLevel = 2.4 * attenuationFactor;
+    
+            context.save();
+    
+            const opacityPercentage = (1 - lightLevel) * 100;
+            if (opacityPercentage > 60) {
+                context.filter = `opacity(${opacityPercentage}%)`;
+            }
+    
+            context.globalAlpha = lightLevel;
+    
+            if (opacityPercentage <= 99) {
+                context.drawImage(
+                    spriteFromState.textures[spriteFromState.texture],
+                    map.offsetX + item.ray - Math.floor(item.spriteHeight / 2), 
+                    map.offsetY + (HEIGHT / 2) - (item.spriteHeight / 2), 
+                    item.spriteHeight, 
+                    item.spriteHeight
+                );
+            }
+    
+            context.restore();
+            context.filter = 'none';
+        } else {
+            console.log("drawSprite: NO item.sprideId")
         }
+        
 
-        context.globalAlpha = lightLevel;
-
-        if (opacityPercentage <= 99) {
-            context.drawImage(
-                item.spriteTexture, 
-                map.offsetX + item.ray - Math.floor(item.spriteHeight / 2), 
-                map.offsetY + (HEIGHT / 2) - (item.spriteHeight / 2), 
-                item.spriteHeight, 
-                item.spriteHeight
-            );
-        }
-
-        context.restore();
-        context.filter = 'none';
     }
 }
 

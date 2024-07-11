@@ -1,9 +1,10 @@
 import { player } from "./player";
-import { Sprite } from "./sprites";
+import { defaultBarrelSprite, DestructableSprite, Sprite } from "./sprites";
 import { WIDTH, FOV, STEP_ANGLE, MAP_SCALE } from "./constants";
 import { map } from "./map";
 import { normalizeSprite2PlayerAngle } from "./math";
 import { barrelTextures } from "./graphics";
+import { getState } from "./state";
 
 
 const TEXTURED_WALLS_ENABLED = true;
@@ -32,6 +33,7 @@ export interface DepthBufferItem {
     spriteY?: number;                     // For sprites
     spriteHeight?: number;                // For sprites
     spriteType?: string;                  // For specialized sprites
+    spriteId?: number,                    // For sprites
     
 }
 
@@ -181,15 +183,17 @@ export function getDepthBufferByRayCast(): DepthBufferItem[] {
         currentAngle -= STEP_ANGLE;
     }
 
-    depthBuffer = addSpritesToDepthBuffer(map.sprites, depthBuffer);
+    depthBuffer = addSpritesToDepthBuffer(getState().barrels, depthBuffer);
 
     return depthBuffer;
 }
 
 
-export function addSpritesToDepthBuffer(spritesData: Sprite[], depthBuffer: DepthBufferItem[]): DepthBufferItem[] {
+export function addSpritesToDepthBuffer(spritesData: {[id: number ]: DestructableSprite}, depthBuffer: DepthBufferItem[]): DepthBufferItem[] {
 
-    spritesData.forEach(sprite => {
+    const state = getState();
+
+    Object.values(spritesData).forEach(sprite => {
 
         const spriteX = sprite.x - player.x;
         const spriteY = sprite.y - player.y;
@@ -210,7 +214,15 @@ export function addSpritesToDepthBuffer(spritesData: Sprite[], depthBuffer: Dept
         const spriteHeight = MAP_SCALE * 300 / spriteDistance;
         const spriteTexture = barrelTextures[sprite.texture];
 
+        switch (sprite.type) {
+            case "barrel":
+                state.addBarrel(sprite.id, sprite as DestructableSprite) 
+            
+                break;
+        }
+
         depthBuffer.push({
+            spriteId: sprite.id,
             type: 'sprite',
             depth: spriteDistance,
             ray: Math.floor(spriteRay),
@@ -219,6 +231,7 @@ export function addSpritesToDepthBuffer(spritesData: Sprite[], depthBuffer: Dept
             spriteY: spriteY,
             spriteHeight: spriteHeight
         });
+
 
     });
 

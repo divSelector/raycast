@@ -2,10 +2,10 @@ import './style.css'
 import { renderFPS, updateFPS } from './display';
 import { drawGame, drawCanvasClamp } from './canvas';
 import { movePlayer } from './player';
-import { loadMapToState } from './map';
-import { mazeLevel } from './levels';
+import { loadMap } from './map';
+import { mazeLevel, level, initialLevel } from './levels';
 
-loadMapToState(mazeLevel);
+loadMap(initialLevel);
 
 function gameLoop() {
 

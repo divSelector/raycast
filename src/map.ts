@@ -26,14 +26,14 @@ export const map: Map = {
 };
 
 
-export function loadMapToState(level: Level) {
+export function loadMap(level: Level) {
 
     const state = getState();
 
     for (let sprite of level.sprites) {
         switch (sprite.type) {
             case "barrel":
-                state.addBarrel(sprite as DestructableSprite);
+                state.addBarrel(sprite.id, sprite as DestructableSprite);
         }
     }
 

@@ -77,6 +77,7 @@ function generateMaze(width: number, height: number): LevelArea {
 function generateBarrelsForMaze(maze: LevelArea, width: number, height: number): Sprite[] {
         const margin = MAP_SCALE * 0.30;
         let sprites: Sprite[] = [];
+        let currentId = 0;
         
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
@@ -110,6 +111,8 @@ function generateBarrelsForMaze(maze: LevelArea, width: number, height: number):
                             x: x * MAP_SCALE + offsetX,
                             y: y * MAP_SCALE + offsetY,
                         });
+
+                        currentId++;
                     }
                 }
             }

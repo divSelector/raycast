@@ -3,12 +3,13 @@ import { map } from "./map";
 import { normalizePlayerAngle } from "./math";
 import { MAP_SCALE } from "./constants";
 import { getState } from "./state";
-import { Sprite } from "./sprites";
+import { DestructableSprite, Sprite } from "./sprites";
 import { crowbar, Weapon } from "./weapon";
 
 const MAP_SPEED = (MAP_SCALE / 2) / 18;
 const PIVOT_SPEED = 0.05;
 
+const state = getState();
 
 interface Player {
     x: number;
@@ -72,11 +73,19 @@ function handlePlayerInput() {
     if (isKeyJustPressed('fire')) {
         player.equippedWeapon.animate();
         const barrels = getState().barrels
-        const hitSprite = checkForHit(barrels);
+        let hitSprite = checkForHit(barrels);
         if (hitSprite) {
-            // Handle what happens when the crowbar hits a sprite
             console.log('Hit sprite:', hitSprite);
-            // Example: reduce sprite's health, destroy it, etc.
+            switch (hitSprite.type) {
+                case "barrel":
+                    let damagedSprite = hitSprite as DestructableSprite;
+                    damagedSprite.hitPoints -= player.equippedWeapon.damage;
+                    damagedSprite.texture += 1;
+                    console.log('damagedSprite.id: ', damagedSprite.id)
+                    state.addBarrel(damagedSprite.id, damagedSprite)
+                    console.log("state: ", state.barrels[damagedSprite.id])
+                    break;
+            }
         }
     } else {
         player.equippedWeapon.draw();
@@ -166,22 +175,25 @@ export function movePlayer() {
     handlePlayerInput();
 
     const barrels = getState().barrels
+    const BarrelsArray = Object.values(barrels);
 
     const offsets = calculatePlayerOffsets();
     const wallTargets = calculateTargetForWallCollision(offsets);
     const spriteTargets = calculateTargetForSpriteCollision(offsets);
 
-    updatePlayerPosition(offsets, wallTargets, spriteTargets, barrels);
+    updatePlayerPosition(offsets, wallTargets, spriteTargets, BarrelsArray);
 }
 
 
-function checkForHit(sprites: Sprite[]): Sprite | null {
+function checkForHit(sprites: { [id: number]: DestructableSprite }): Sprite | null {
     const offsets: MovementVectors = calculatePlayerOffsets(player.equippedWeapon.range);
 
     const targetPositions = calculateTargetForSpriteCollision(offsets);
 
-    const hitSprite = getSpriteAtPosition(targetPositions.x, targetPositions.y, sprites) ||
-                      getSpriteAtPosition(targetPositions.strafeX, targetPositions.strafeY, sprites);
+    const spriteArray = Object.values(sprites);
+
+    const hitSprite = getSpriteAtPosition(targetPositions.x, targetPositions.y, spriteArray) ||
+                      getSpriteAtPosition(targetPositions.strafeX, targetPositions.strafeY, spriteArray);
 
     return hitSprite;
 }
