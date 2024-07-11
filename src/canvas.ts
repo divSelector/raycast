@@ -1,6 +1,6 @@
 import { backgrounds } from "./graphics";
 import { walls } from "./graphics";
-import { map } from "./map";
+import { game } from "./game";
 import { DepthBufferItem, getDepthBufferByRayCast, depthBufferTypeGuard } from "./raycaster";
 import { HEIGHT, WIDTH, torchIntensity, torchRange, MAP_SCALE  } from "./constants";
 import { drawMiniMap } from "./minimap";
@@ -13,6 +13,7 @@ const state = getState();
 
 const SCALE = 0.23;
 const LIGHTING_OVERLAY_ALPHA = 0.4;
+
 
 function resizeCanvas() {
     canvas.width = window.innerWidth * SCALE;
@@ -32,12 +33,12 @@ function drawBackground() {
 export function drawCanvasClamp() {
     context.fillStyle = '#242424';
     // Prevents Wall Height From Extending Outside Canvas
-    context.fillRect(0, 0, canvas.width, map.offsetY);
-    context.fillRect(0, map.offsetY + HEIGHT, canvas.width, canvas.width - map.offsetY + 200);
+    context.fillRect(0, 0, canvas.width, game.offsetY);
+    context.fillRect(0, game.offsetY + HEIGHT, canvas.width, canvas.width - game.offsetY + 200);
 
     // Prevent Sprites from Extending Outside Canvas
-    context.fillRect(0, 0, map.offsetX, canvas.height);
-    context.fillRect(map.offsetX + WIDTH, 0, map.offsetX + 1, canvas.height);
+    context.fillRect(0, 0, game.offsetX, canvas.height);
+    context.fillRect(game.offsetX + WIDTH, 0, game.offsetX + 1, canvas.height);
 }
 
 
@@ -45,8 +46,8 @@ function drawColorWall(item: DepthBufferItem) {
     if (depthBufferTypeGuard.isColorWall(item)) {
         context.fillStyle = item.color;
         context.fillRect(
-            map.offsetX + item.ray, 
-            map.offsetY + (HEIGHT / 2 - item.wallHeight / 2), 
+            game.offsetX + item.ray, 
+            game.offsetY + (HEIGHT / 2 - item.wallHeight / 2), 
             1, 
             item.wallHeight
         );
@@ -63,8 +64,8 @@ function drawTextureWall(item: DepthBufferItem) {
             0,
             1,
             MAP_SCALE,
-            map.offsetX + item.ray,
-            map.offsetY + HEIGHT / 2 - item.wallHeight / 2,
+            game.offsetX + item.ray,
+            game.offsetY + HEIGHT / 2 - item.wallHeight / 2,
             1,
             item.wallHeight
         );
@@ -80,14 +81,14 @@ function drawDistantWallLighting(item: DepthBufferItem) {
         const lightLevel = torchIntensity * attenuationFactor;
         
         context.fillStyle = `rgba(0, 0, 0, ${1-lightLevel})`;
-        context.fillRect(map.offsetX + item.ray, map.offsetY + (HEIGHT / 2 - item.wallHeight / 2), 1, item.wallHeight);
+        context.fillRect(game.offsetX + item.ray, game.offsetY + (HEIGHT / 2 - item.wallHeight / 2), 1, item.wallHeight);
     }
 }
 
 
 function drawLightingCanvasOverlay(alpha: number) {
     context.fillStyle = `rgba(0, 0, 0, ${alpha})`;
-    context.fillRect(map.offsetX, map.offsetY, WIDTH + 1, HEIGHT);
+    context.fillRect(game.offsetX, game.offsetY, WIDTH + 1, HEIGHT);
 }
 
 
@@ -116,9 +117,6 @@ export function drawSprite(item: DepthBufferItem) {
     if (depthBufferTypeGuard.isSprite(item)) {
 
         if (item && item.spriteId) {
-            const spriteFromState = state.barrels[item.spriteId]
-
-            // console.log(spriteFromState)
 
             const normalizedDistance = Math.min(item.depth / torchRange, 1);
             const attenuationFactor = 1 - normalizedDistance;
@@ -133,11 +131,12 @@ export function drawSprite(item: DepthBufferItem) {
     
             context.globalAlpha = lightLevel;
     
+            const spriteFromState = state.barrels[item.spriteId]
             if (opacityPercentage <= 99) {
                 context.drawImage(
                     spriteFromState.textures[spriteFromState.texture],
-                    map.offsetX + item.ray - Math.floor(item.spriteHeight / 2), 
-                    map.offsetY + (HEIGHT / 2) - (item.spriteHeight / 2), 
+                    game.offsetX + item.ray - Math.floor(item.spriteHeight / 2), 
+                    game.offsetY + (HEIGHT / 2) - (item.spriteHeight / 2), 
                     item.spriteHeight, 
                     item.spriteHeight
                 );
@@ -146,7 +145,7 @@ export function drawSprite(item: DepthBufferItem) {
             context.restore();
             context.filter = 'none';
         } else {
-            console.log("drawSprite: NO item.sprideId")
+            console.error("drawSprite: NO item.sprideId")
         }
         
 

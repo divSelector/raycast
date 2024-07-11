@@ -4,7 +4,7 @@ import { player } from "./player";
 import { getState } from "./state";
 
 
-export interface Map {
+export interface Game {
     offsetX: number;
     offsetY: number;
     scale: number;
@@ -15,7 +15,7 @@ export interface Map {
 }
 
 
-export const map: Map = {
+export const game: Game = {
     offsetX: 0,
     offsetY: 0,
     scale: 63,
@@ -37,8 +37,8 @@ export function loadMap(level: Level) {
         }
     }
 
-    map.level = level.area;
-    map.size = level.size;
+    game.level = level.area;
+    game.size = level.size;
     player.x = level.playerStartX;
     player.y = level.playerStartY;
 }

@@ -1,28 +1,28 @@
 import { player } from "./player";
-import { map } from "./map";
+import { game } from "./game";
 import { context, canvas } from "./canvas";
 import { isKeyJustPressed } from "./input";
 import { WIDTH, HEIGHT, MAP_SCALE } from "./constants";
 
 
 function updateMiniMapOffsets() {
-    map.offsetX = Math.floor(canvas.width / 2) - WIDTH / 2;
-    map.offsetY = Math.floor(canvas.height / 2) - HEIGHT / 2;
+    game.offsetX = Math.floor(canvas.width / 2) - WIDTH / 2;
+    game.offsetY = Math.floor(canvas.height / 2) - HEIGHT / 2;
 }
 
 
 function updatePlayerMapOffsets() {
-    player.mapX = (player.x / MAP_SCALE) * map.minimapScale + map.offsetX;
-    player.mapY = (player.y / MAP_SCALE) * map.minimapScale + map.offsetY;
+    player.mapX = (player.x / MAP_SCALE) * game.minimapScale + game.offsetX;
+    player.mapY = (player.y / MAP_SCALE) * game.minimapScale + game.offsetY;
 }
 
 
 function updateShowMiniMap() {
     if (isKeyJustPressed('minimap')) {
-        if (map.showMinimap) {
-            map.showMinimap = false;
+        if (game.showMinimap) {
+            game.showMinimap = false;
         } else {
-            map.showMinimap = true;
+            game.showMinimap = true;
         }
     }
 }
@@ -32,20 +32,20 @@ export function drawMiniMap() {
     updateShowMiniMap();
     updateMiniMapOffsets();
 
-    if (map.showMinimap) {
-        for (let row = 0; row < map.size; row++) {
-            for (let col = 0; col < map.size; col++) {
-                const square = row * map.size + col;
-                if (!map.level) return;
-                if (map.level[square]) {
+    if (game.showMinimap) {
+        for (let row = 0; row < game.size; row++) {
+            for (let col = 0; col < game.size; col++) {
+                const square = row * game.size + col;
+                if (!game.level) return;
+                if (game.level[square]) {
                     context.fillStyle = '#555';
                 } else {
                     context.fillStyle = '#aaa';
                 }
                 context.fillRect(
-                    map.offsetX + col * map.minimapScale, 
-                    map.offsetY + row * map.minimapScale, 
-                    map.minimapScale, map.minimapScale
+                    game.offsetX + col * game.minimapScale, 
+                    game.offsetY + row * game.minimapScale, 
+                    game.minimapScale, game.minimapScale
                 )
             }
         }
@@ -58,7 +58,7 @@ export function drawMiniMap() {
 export function drawMiniMapPlayer() {
     updatePlayerMapOffsets();
 
-    if (map.showMinimap) {
+    if (game.showMinimap) {
         context.fillStyle = 'Blue';
         context.beginPath();
         context.arc(player.mapX, player.mapY, 2, 0, Math.PI * 2);

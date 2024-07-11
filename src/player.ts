@@ -1,5 +1,5 @@
 import { isKeyPressed, isKeyJustPressed, getMouseDeltaX } from "./input";
-import { map } from "./map";
+import { game } from "./game";
 import { normalizePlayerAngle } from "./math";
 import { MAP_SCALE } from "./constants";
 import { getState } from "./state";
@@ -105,11 +105,11 @@ function calculatePlayerOffsets(multiplier: number = MAP_SPEED): MovementVectors
 function calculateTargetForWallCollision(offsets: MovementVectors): MovementVectors {
     const proximityLimit = 10;
 
-    const targetX = Math.floor(player.y / MAP_SCALE) * map.size + Math.floor((player.x + offsets.x * player.moveX * proximityLimit) / MAP_SCALE);
-    const targetY = Math.floor((player.y + offsets.y * player.moveY * proximityLimit) / MAP_SCALE) * map.size + Math.floor(player.x / MAP_SCALE);
+    const targetX = Math.floor(player.y / MAP_SCALE) * game.size + Math.floor((player.x + offsets.x * player.moveX * proximityLimit) / MAP_SCALE);
+    const targetY = Math.floor((player.y + offsets.y * player.moveY * proximityLimit) / MAP_SCALE) * game.size + Math.floor(player.x / MAP_SCALE);
 
-    const strafeTargetX = Math.floor((player.y + offsets.strafeY * player.strafeX * proximityLimit) / MAP_SCALE) * map.size + Math.floor(player.x / MAP_SCALE);
-    const strafeTargetY = Math.floor(player.y / MAP_SCALE) * map.size + Math.floor((player.x + offsets.strafeX * player.strafeX * proximityLimit) / MAP_SCALE);
+    const strafeTargetX = Math.floor((player.y + offsets.strafeY * player.strafeX * proximityLimit) / MAP_SCALE) * game.size + Math.floor(player.x / MAP_SCALE);
+    const strafeTargetY = Math.floor(player.y / MAP_SCALE) * game.size + Math.floor((player.x + offsets.strafeX * player.strafeX * proximityLimit) / MAP_SCALE);
 
     return { x: targetX, y: targetY, strafeX: strafeTargetX, strafeY: strafeTargetY };
 }
@@ -143,7 +143,7 @@ function checkCollision(movePos: number, wallTarget: number, targetX: number, ta
         return true;
     }
 
-    if (movePos && map.level[wallTarget] === 0 && !sprite) {
+    if (movePos && game.level[wallTarget] === 0 && !sprite) {
         return true;
     } else {
         return false;

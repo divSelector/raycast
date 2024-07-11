@@ -1,7 +1,7 @@
 import { player } from "./player";
 import { defaultBarrelSprite, DestructableSprite, Sprite } from "./sprites";
 import { WIDTH, FOV, STEP_ANGLE, MAP_SCALE } from "./constants";
-import { map } from "./map";
+import { game } from "./game";
 import { normalizeSprite2PlayerAngle } from "./math";
 import { barrelTextures } from "./graphics";
 import { getState } from "./state";
@@ -59,7 +59,7 @@ function calculateVerticalIntersection(sinAngle: number, cosAngle: number): RayI
     let rayEndY: number = 0;
     let depth = Infinity;
     let texture: number = 0;
-    const mapRange = MAP_SCALE * map.size;
+    const mapRange = MAP_SCALE * game.size;
 
     let directionX = sinAngle > 0 ? 1 : -1;
     let initialX = directionX > 0
@@ -75,10 +75,10 @@ function calculateVerticalIntersection(sinAngle: number, cosAngle: number): RayI
         let mapTargetY = Math.floor(rayEndY / MAP_SCALE);
         if (directionX < 0) mapTargetX += directionX;
         
-        let targetSquare = mapTargetY * map.size + mapTargetX;
-        if (targetSquare < 0 || targetSquare >= map.level.length) break;
-        if (map.level[targetSquare] !== 0) {
-            texture = map.level[targetSquare];
+        let targetSquare = mapTargetY * game.size + mapTargetX;
+        if (targetSquare < 0 || targetSquare >= game.level.length) break;
+        if (game.level[targetSquare] !== 0) {
+            texture = game.level[targetSquare];
             break;
         }
 
@@ -95,7 +95,7 @@ function calculateHorizontalIntersection(sinAngle: number, cosAngle: number): Ra
     let rayEndY: number = 0;
     let depth = Infinity;
     let texture: number = 0;
-    const mapRange = MAP_SCALE * map.size;
+    const mapRange = MAP_SCALE * game.size;
 
     let directionY = cosAngle > 0 ? 1 : -1;
     let initialY = directionY > 0
@@ -111,10 +111,10 @@ function calculateHorizontalIntersection(sinAngle: number, cosAngle: number): Ra
         let mapTargetY = Math.floor(rayEndY / MAP_SCALE);
         if (directionY < 0) mapTargetY += directionY;
 
-        let targetSquare = mapTargetY * map.size + mapTargetX;
-        if (targetSquare < 0 || targetSquare >= map.level.length) break;
-        if (map.level[targetSquare] !== 0) {
-            texture = map.level[targetSquare];
+        let targetSquare = mapTargetY * game.size + mapTargetX;
+        if (targetSquare < 0 || targetSquare >= game.level.length) break;
+        if (game.level[targetSquare] !== 0) {
+            texture = game.level[targetSquare];
             break;
         }
 
@@ -217,7 +217,6 @@ export function addSpritesToDepthBuffer(spritesData: {[id: number ]: Destructabl
         switch (sprite.type) {
             case "barrel":
                 state.storeBarrel(sprite.id, sprite as DestructableSprite) 
-            
                 break;
         }
 
