@@ -15,6 +15,8 @@ export interface DestructableSprite extends Sprite {
     hitPoints: number;
     maxHitPoints: number;
     textures: HTMLImageElement[];
+    invincible: boolean;
+    lastTimeHit: number;
 }
 
 export const defaultBarrelSprite: DestructableSprite = {
@@ -28,6 +30,8 @@ export const defaultBarrelSprite: DestructableSprite = {
     height: DEFAULT_SPRITE_SIZE,
     hitPoints: 3,
     maxHitPoints: 3,
+    invincible: false,
+    lastTimeHit: 0,
 }
 
 export const barrelSpritesForLevel: DestructableSprite[] = [

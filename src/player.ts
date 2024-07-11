@@ -1,7 +1,7 @@
 import { isKeyPressed, isKeyJustPressed, getMouseDeltaX } from "./input";
 import { game } from "./game";
 import { normalizePlayerAngle } from "./math";
-import { MAP_SCALE } from "./constants";
+import { INVINCIBILITY_DURATION, MAP_SCALE } from "./constants";
 import { getState } from "./state";
 import { DestructableSprite, Sprite } from "./sprites";
 import { crowbar, Weapon } from "./weapon";
@@ -78,11 +78,21 @@ function handlePlayerInput() {
             switch (hitSprite.type) {
                 case "barrel":
                     let damagedSprite = hitSprite as DestructableSprite;
-                    if (damagedSprite.hitPoints > 1) {
-                        damagedSprite.hitPoints -= player.equippedWeapon.damage;
-                        damagedSprite.texture += 1;
+                    const currentTime = Date.now();
+                    console.log(damagedSprite)
+                    if (!damagedSprite.invincible && currentTime - damagedSprite.lastTimeHit > INVINCIBILITY_DURATION) {
+                        if (damagedSprite.hitPoints > 1) {
+                            damagedSprite.hitPoints -= player.equippedWeapon.damage;
+                            damagedSprite.texture += 1;
+                        }
+                        damagedSprite.invincible = true;
+                        damagedSprite.lastTimeHit = currentTime;
+                        setTimeout(() => {
+                            damagedSprite.invincible = false;
+                            state.storeBarrel(damagedSprite.id, damagedSprite);
+                        }, INVINCIBILITY_DURATION);
+                        state.storeBarrel(damagedSprite.id, damagedSprite);
                     }
-                    state.storeBarrel(damagedSprite.id, damagedSprite)
                     break;
             }
         }

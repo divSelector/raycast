@@ -23,6 +23,8 @@ const storeBarrel = (id: number, sprite: Partial<DestructableSprite>) => {
       hitPoints: sprite.hitPoints || 100,
       maxHitPoints: sprite.maxHitPoints || 100,
       textures: sprite.textures || [],
+      invincible: sprite.invincible || false,
+      lastTimeHit: sprite.lastTimeHit || 0
     };
   }
 };
