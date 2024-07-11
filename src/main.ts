@@ -4,6 +4,8 @@ import { drawGame, drawCanvasClamp } from './canvas';
 import { movePlayer } from './player';
 import { loadMap } from './game';
 import { mazeLevel, level, initialLevel } from './levels';
+import { moveSprites } from './sprites';
+
 
 loadMap(mazeLevel);
 
@@ -14,6 +16,8 @@ function gameLoop() {
   drawGame();
 
   movePlayer();
+
+  moveSprites();
 
   drawCanvasClamp();
 

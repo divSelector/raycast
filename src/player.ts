@@ -3,7 +3,7 @@ import { game } from "./game";
 import { normalizePlayerAngle } from "./math";
 import { INVINCIBILITY_DURATION, MAP_SCALE } from "./constants";
 import { getState } from "./state";
-import { DestructableSprite, Sprite } from "./sprites";
+import { DestructableSprite, LaunchableSprite, Sprite } from "./sprites";
 import { crowbar, Weapon } from "./weapon";
 
 const MAP_SPEED = (MAP_SCALE / 2) / 18;
@@ -24,7 +24,7 @@ interface Player {
     equippedWeapon: Weapon;
 }
 
-interface MovementVectors {
+export interface MovementVectors {
     x: number;
     y: number;
     strafeX: number;
@@ -85,11 +85,18 @@ function handlePlayerInput() {
                             damagedSprite.hitPoints -= player.equippedWeapon.damage;
                             damagedSprite.texture += 1;
                         }
+                        const dx = damagedSprite.x - player.x;
+                        const dy = damagedSprite.y - player.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        const force = 12;
+                        damagedSprite.moveX = (dx / distance) * force;
+                        damagedSprite.moveY = (dy / distance) * force;
+                        damagedSprite.distanceMoved = 0;
                         damagedSprite.invincible = true;
                         damagedSprite.lastTimeHit = currentTime;
                         setTimeout(() => {
                             damagedSprite.invincible = false;
-                            state.storeBarrel(damagedSprite.id, damagedSprite);
+                            state.storeBarrel(damagedSprite.id, { invincible: damagedSprite.invincible });
                         }, INVINCIBILITY_DURATION);
                         state.storeBarrel(damagedSprite.id, damagedSprite);
                     }
@@ -102,30 +109,32 @@ function handlePlayerInput() {
 }
 
 
-function calculatePlayerOffsets(multiplier: number = MAP_SPEED): MovementVectors {
+export function calculateMovementOffset(angle: number = player.angle, multiplier: number = MAP_SPEED): MovementVectors {
     return {
-        x: Math.sin(player.angle) * multiplier,
-        y: Math.cos(player.angle) * multiplier,
-        strafeX: Math.sin(player.angle + Math.PI / 2) * multiplier,
-        strafeY: Math.cos(player.angle + Math.PI / 2) * multiplier,
+        x: Math.sin(angle) * multiplier,
+        y: Math.cos(angle) * multiplier,
+        strafeX: Math.sin(angle + Math.PI / 2) * multiplier,
+        strafeY: Math.cos(angle + Math.PI / 2) * multiplier,
     };
 }
 
-
-function calculateTargetForWallCollision(offsets: MovementVectors): MovementVectors {
+export function calculateTargetForWallCollision(offsets: MovementVectors): MovementVectors {
     const proximityLimit = 10;
 
     const targetX = Math.floor(player.y / MAP_SCALE) * game.size + Math.floor((player.x + offsets.x * player.moveX * proximityLimit) / MAP_SCALE);
     const targetY = Math.floor((player.y + offsets.y * player.moveY * proximityLimit) / MAP_SCALE) * game.size + Math.floor(player.x / MAP_SCALE);
 
+
+
     const strafeTargetX = Math.floor((player.y + offsets.strafeY * player.strafeX * proximityLimit) / MAP_SCALE) * game.size + Math.floor(player.x / MAP_SCALE);
     const strafeTargetY = Math.floor(player.y / MAP_SCALE) * game.size + Math.floor((player.x + offsets.strafeX * player.strafeX * proximityLimit) / MAP_SCALE);
+    
 
     return { x: targetX, y: targetY, strafeX: strafeTargetX, strafeY: strafeTargetY };
 }
 
 
-function calculateTargetForSpriteCollision(offsets: MovementVectors): MovementVectors {
+export function calculateTargetForSpriteCollision(offsets: MovementVectors): MovementVectors {
     const x = player.x + offsets.x * player.moveX;
     const y = player.y + offsets.y * player.moveY;
     const strafeX = player.x + offsets.strafeX * player.strafeX;
@@ -145,17 +154,24 @@ function getSpriteAtPosition(x: number, y: number, sprites: Sprite[], proximityT
     return null;
 }
 
+export function checkCollision(movePos: number, wallTarget: number, targetX: number, targetY: number, sprites: Sprite[], excludeSprite?: Sprite): boolean {
+    // console.log(`Checking collision for movePos: ${movePos}, wallTarget: ${wallTarget}, targetX: ${targetX}, targetY: ${targetY}`);
 
-function checkCollision(movePos: number, wallTarget: number, targetX: number, targetY: number, sprites: Sprite[], ): boolean {
+    if (excludeSprite) {
+        sprites = sprites.filter(sprite => sprite.id !== excludeSprite.id);
+    }
 
     const sprite = getSpriteAtPosition(targetX, targetY, sprites) as DestructableSprite;
     if (sprite && sprite.hitPoints <= 1 && sprite.type == 'barrel') {
+        console.log("Collision with destructible sprite");
         return true;
     }
 
     if (movePos && game.level[wallTarget] === 0 && !sprite) {
+        console.log("Collision with wall or empty space");
         return true;
     } else {
+        // console.log("Collision blocked");
         return false;
     }
 }
@@ -192,7 +208,7 @@ export function movePlayer() {
     const barrels = getState().barrels
     const BarrelsArray = Object.values(barrels);
 
-    const offsets = calculatePlayerOffsets();
+    const offsets = calculateMovementOffset();
     const wallTargets = calculateTargetForWallCollision(offsets);
     const spriteTargets = calculateTargetForSpriteCollision(offsets);
 
@@ -201,7 +217,7 @@ export function movePlayer() {
 
 
 function checkForHit(sprites: { [id: number]: DestructableSprite }): Sprite | null {
-    const offsets: MovementVectors = calculatePlayerOffsets(player.equippedWeapon.range);
+    const offsets: MovementVectors = calculateMovementOffset(player.angle, player.equippedWeapon.range);
 
     const targetPositions = calculateTargetForSpriteCollision(offsets);
 

@@ -2,32 +2,39 @@ import { DestructableSprite } from "./sprites";
 
 interface GameState {
   barrels: { [id: number]: DestructableSprite };
-  storeBarrel: (id: number, sprite: DestructableSprite) => void;
+  storeBarrel: (id: number, updatedFields: Partial<DestructableSprite>) => void;
 }
 
 export const getState = () => state;
 
-const storeBarrel = (id: number, sprite: Partial<DestructableSprite>) => {
+const storeBarrel = (id: number, updatedFields: Partial<DestructableSprite>) => {
   const existingBarrel = state.barrels[id];
+  
   if (existingBarrel) {
-    state.barrels[id] = { ...existingBarrel, ...sprite };
+    // console.log(`Updating barrel ${id} with`, updatedFields);
+    state.barrels[id] = { ...existingBarrel, ...updatedFields };
   } else {
+    // console.log(`Creating new barrel ${id} with`, updatedFields);
     state.barrels[id] = {
       id: id,
       type: 'barrel',
-      x: sprite.x || 0,
-      y: sprite.y || 0,
-      width: sprite.width || 1,
-      height: sprite.height || 1,
-      texture: sprite.texture || 0,
-      hitPoints: sprite.hitPoints || 100,
-      maxHitPoints: sprite.maxHitPoints || 100,
-      textures: sprite.textures || [],
-      invincible: sprite.invincible || false,
-      lastTimeHit: sprite.lastTimeHit || 0
+      x: updatedFields.x || 0,
+      y: updatedFields.y || 0,
+      width: updatedFields.width || 1,
+      height: updatedFields.height || 1,
+      texture: updatedFields.texture || 0,
+      hitPoints: updatedFields.hitPoints || 100,
+      maxHitPoints: updatedFields.maxHitPoints || 100,
+      textures: updatedFields.textures || [],
+      invincible: updatedFields.invincible || false,
+      lastTimeHit: updatedFields.lastTimeHit || 0,
+      moveX: updatedFields.moveX || 0,
+      moveY: updatedFields.moveY || 0,
+      distanceMoved: updatedFields.distanceMoved || 0
     };
   }
 };
+
 
 const state: GameState = {
   barrels: [],
