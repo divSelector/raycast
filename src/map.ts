@@ -1,4 +1,4 @@
-import { DestructableSprite, Sprite } from "./sprites";
+import { DestructableSprite } from "./sprites";
 import { LevelArea, Level, initialLevelArea } from "./levels";
 import { player } from "./player";
 import { getState } from "./state";
@@ -11,7 +11,6 @@ export interface Map {
     showMinimap: boolean;
     minimapScale: number;
     level: LevelArea;
-    sprites: Sprite[];
 }
 
 export const map: Map = {
@@ -22,7 +21,6 @@ export const map: Map = {
     showMinimap: false,
     minimapScale: 5,
     level: initialLevelArea,
-    sprites: []
 };
 
 
@@ -39,7 +37,6 @@ export function loadMap(level: Level) {
 
     map.level = level.area;
     map.size = level.size;
-    map.sprites = level.sprites;
     player.x = level.playerStartX;
     player.y = level.playerStartY;
 }
