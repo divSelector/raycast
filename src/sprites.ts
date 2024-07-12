@@ -53,7 +53,7 @@ export const barrelSpritesForLevel: DestructableSprite[] = [
         id: 1
     }
 ];
-
+let snapIncrement = 32;
 function updateSpritesPosition(offsets: MovementVectors, sprites: Sprite[]): void {
     const barrels = getState().barrels;
 
@@ -66,18 +66,11 @@ function updateSpritesPosition(offsets: MovementVectors, sprites: Sprite[]): voi
             const wallTargets = calculateTargetForWallCollision(sprite, offsets);
             const spriteTargets = calculateTargetForSpriteCollision(sprite, offsets);
 
-            // console.log(`Sprite ${id} should move. Current position: (${sprite.x}, ${sprite.y}), moveX: ${sprite.moveX}, moveY: ${sprite.moveY}`);
-
             const nextX = sprite.x + sprite.moveX;
             const nextY = sprite.y + sprite.moveY;
 
-            // Check for collisions with walls or other sprites
-            // const canMoveX = true; // Simplified collision check for testing
-            // const canMoveY = true; // Simplified collision check for testing
-
             const canMoveX = () => checkCollision(sprite.moveX, wallTargets.x, spriteTargets.x, sprite.y, sprites, sprite);
             const canMoveY = () => checkCollision(sprite.moveY, wallTargets.y, sprite.x, spriteTargets.y, sprites, sprite);
-
 
             if (canMoveX() && canMoveY()) {
                 sprite.x = nextX;
@@ -87,14 +80,20 @@ function updateSpritesPosition(offsets: MovementVectors, sprites: Sprite[]): voi
                 sprite.moveX *= 0.95;
                 sprite.moveY *= 0.95;
                 
+                
                 if (sprite.distanceMoved >= 1000 || (Math.abs(sprite.moveX) < 0.1 && Math.abs(sprite.moveY) < 0.1)) {
                     sprite.moveX = 0;
                     sprite.moveY = 0;
+                    sprite.x = Math.round(sprite.x / snapIncrement) * snapIncrement;
+                    sprite.y = Math.round(sprite.y / snapIncrement) * snapIncrement;
                 }
             } else {
-                // Stop sprite if collision detected in either direction
                 sprite.moveX = 0;
                 sprite.moveY = 0;
+                sprite.x = sprite.x
+                sprite.y = sprite.y
+                sprite.x = Math.round(sprite.x / snapIncrement) * snapIncrement;
+                sprite.y = Math.round(sprite.y / snapIncrement) * snapIncrement;
             }
             
             getState().storeBarrel(sprite.id, sprite);

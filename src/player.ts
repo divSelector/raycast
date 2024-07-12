@@ -1,7 +1,7 @@
 import { isKeyPressed, isKeyJustPressed, getMouseDeltaX } from "./input";
 import { game } from "./game";
 import { normalizePlayerAngle } from "./math";
-import { DEFAULT_SPRITE_SIZE, INVINCIBILITY_DURATION, MAP_SCALE } from "./constants";
+import { INVINCIBILITY_DURATION, MAP_SCALE } from "./constants";
 import { getState } from "./state";
 import { DestructableSprite, LaunchableSprite, Sprite } from "./sprites";
 import { crowbar, Weapon } from "./weapon";

@@ -1,5 +1,5 @@
 import { player } from "./player";
-import { defaultBarrelSprite, DestructableSprite, Sprite } from "./sprites";
+import { DestructableSprite } from "./sprites";
 import { WIDTH, FOV, STEP_ANGLE, MAP_SCALE } from "./constants";
 import { game } from "./game";
 import { normalizeSprite2PlayerAngle } from "./math";
