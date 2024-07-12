@@ -113,6 +113,7 @@ function drawCamera() {
     drawLightingCanvasOverlay(LIGHTING_OVERLAY_ALPHA);
 }
 
+
 export function drawSprite(item: DepthBufferItem) {
     if (depthBufferTypeGuard.isSprite(item)) {
 

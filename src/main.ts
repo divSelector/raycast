@@ -7,7 +7,7 @@ import { mazeLevel, level, initialLevel } from './levels';
 import { moveSprites } from './sprites';
 
 
-loadMap(mazeLevel);
+loadMap(level);
 
 function gameLoop() {
 

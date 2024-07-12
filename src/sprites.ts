@@ -54,13 +54,17 @@ export const barrelSpritesForLevel: DestructableSprite[] = [
     }
 ];
 
-function updateSpritesPosition(offsets: MovementVectors, wallTargets: MovementVectors, spriteTargets: MovementVectors, sprites: Sprite[]): void {
+function updateSpritesPosition(offsets: MovementVectors, sprites: Sprite[]): void {
     const barrels = getState().barrels;
-    const barrelsArray = Object.values(barrels);
 
     for (let id in barrels) {
+
         let sprite = barrels[id] as DestructableSprite;
+
         if (sprite.moveX || sprite.moveY) {
+
+            const wallTargets = calculateTargetForWallCollision(sprite, offsets);
+            const spriteTargets = calculateTargetForSpriteCollision(sprite, offsets);
 
             // console.log(`Sprite ${id} should move. Current position: (${sprite.x}, ${sprite.y}), moveX: ${sprite.moveX}, moveY: ${sprite.moveY}`);
 
@@ -74,30 +78,26 @@ function updateSpritesPosition(offsets: MovementVectors, wallTargets: MovementVe
             const canMoveX = () => checkCollision(sprite.moveX, wallTargets.x, spriteTargets.x, sprite.y, sprites, sprite);
             const canMoveY = () => checkCollision(sprite.moveY, wallTargets.y, sprite.x, spriteTargets.y, sprites, sprite);
 
-            if (canMoveX() || canMoveY()) {
-                // console.log(`Sprite ${id} collision passed. Moving to: (${nextX}, ${nextY})`);
+
+            if (canMoveX() && canMoveY()) {
                 sprite.x = nextX;
                 sprite.y = nextY;
                 sprite.distanceMoved += Math.sqrt(sprite.moveX * sprite.moveX + sprite.moveY * sprite.moveY);
                 
-                // Reduce velocity (friction) and stop if max distance is reached
                 sprite.moveX *= 0.95;
                 sprite.moveY *= 0.95;
                 
                 if (sprite.distanceMoved >= 1000 || (Math.abs(sprite.moveX) < 0.1 && Math.abs(sprite.moveY) < 0.1)) {
-                    // console.log(`Sprite ${id} has stopped moving.`);
                     sprite.moveX = 0;
                     sprite.moveY = 0;
                 }
-
-                getState().storeBarrel(sprite.id, sprite);
             } else {
-                // Stop sprite if collision detected
-                // console.log(`Sprite ${id} collision detected. Stopping.`);
+                // Stop sprite if collision detected in either direction
                 sprite.moveX = 0;
                 sprite.moveY = 0;
-                getState().storeBarrel(sprite.id, sprite);
             }
+            
+            getState().storeBarrel(sprite.id, sprite);
         }
     }
 }
@@ -109,8 +109,7 @@ export function moveSprites() {
     const BarrelsArray = Object.values(barrels);
 
     const offsets = calculateMovementOffset();
-    const wallTargets = calculateTargetForWallCollision(offsets);
-    const spriteTargets = calculateTargetForSpriteCollision(offsets);
 
-    updateSpritesPosition(offsets, wallTargets, spriteTargets, BarrelsArray);
+
+    updateSpritesPosition(offsets, BarrelsArray);
 }

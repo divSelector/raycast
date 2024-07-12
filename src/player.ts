@@ -1,7 +1,7 @@
 import { isKeyPressed, isKeyJustPressed, getMouseDeltaX } from "./input";
 import { game } from "./game";
 import { normalizePlayerAngle } from "./math";
-import { INVINCIBILITY_DURATION, MAP_SCALE } from "./constants";
+import { DEFAULT_SPRITE_SIZE, INVINCIBILITY_DURATION, MAP_SCALE } from "./constants";
 import { getState } from "./state";
 import { DestructableSprite, LaunchableSprite, Sprite } from "./sprites";
 import { crowbar, Weapon } from "./weapon";
@@ -79,7 +79,7 @@ function handlePlayerInput() {
                 case "barrel":
                     let damagedSprite = hitSprite as DestructableSprite;
                     const currentTime = Date.now();
-                    console.log(damagedSprite)
+                    
                     if (!damagedSprite.invincible && currentTime - damagedSprite.lastTimeHit > INVINCIBILITY_DURATION) {
                         if (damagedSprite.hitPoints > 1) {
                             damagedSprite.hitPoints -= player.equippedWeapon.damage;
@@ -118,27 +118,50 @@ export function calculateMovementOffset(angle: number = player.angle, multiplier
     };
 }
 
-export function calculateTargetForWallCollision(offsets: MovementVectors): MovementVectors {
-    const proximityLimit = 10;
+// export function calculateTargetForWallCollision(offsets: MovementVectors): MovementVectors {
+//     const proximityLimit = 10;
 
-    const targetX = Math.floor(player.y / MAP_SCALE) * game.size + Math.floor((player.x + offsets.x * player.moveX * proximityLimit) / MAP_SCALE);
-    const targetY = Math.floor((player.y + offsets.y * player.moveY * proximityLimit) / MAP_SCALE) * game.size + Math.floor(player.x / MAP_SCALE);
+//     const targetX = Math.floor(player.y / MAP_SCALE) * game.size + Math.floor((player.x + offsets.x * player.moveX * proximityLimit) / MAP_SCALE);
+//     const targetY = Math.floor((player.y + offsets.y * player.moveY * proximityLimit) / MAP_SCALE) * game.size + Math.floor(player.x / MAP_SCALE);
 
-
-
-    const strafeTargetX = Math.floor((player.y + offsets.strafeY * player.strafeX * proximityLimit) / MAP_SCALE) * game.size + Math.floor(player.x / MAP_SCALE);
-    const strafeTargetY = Math.floor(player.y / MAP_SCALE) * game.size + Math.floor((player.x + offsets.strafeX * player.strafeX * proximityLimit) / MAP_SCALE);
+//     const strafeTargetX = Math.floor((player.y + offsets.strafeY * player.strafeX * proximityLimit) / MAP_SCALE) * game.size + Math.floor(player.x / MAP_SCALE);
+//     const strafeTargetY = Math.floor(player.y / MAP_SCALE) * game.size + Math.floor((player.x + offsets.strafeX * player.strafeX * proximityLimit) / MAP_SCALE);
     
+
+//     return { x: targetX, y: targetY, strafeX: strafeTargetX, strafeY: strafeTargetY };
+// }
+
+type Entity = LaunchableSprite | Player
+export function calculateTargetForWallCollision(entity: Entity, offsets: MovementVectors): MovementVectors {
+    let proximityLimit = 10;
+
+    let targetX = 0, targetY = 0, strafeTargetX = 0, strafeTargetY = 0;
+
+    if ('strafeX' in entity) {
+        targetX = Math.floor(entity.y / MAP_SCALE) * game.size + Math.floor((entity.x + offsets.x * entity.moveX * proximityLimit) / MAP_SCALE);
+        targetY = Math.floor((entity.y + offsets.y * entity.moveY * proximityLimit) / MAP_SCALE) * game.size + Math.floor(entity.x / MAP_SCALE);
+        strafeTargetX = Math.floor((entity.y + offsets.strafeY * (entity as Player).strafeX * proximityLimit) / MAP_SCALE) * game.size + Math.floor(entity.x / MAP_SCALE);
+        strafeTargetY = Math.floor(entity.y / MAP_SCALE) * game.size + Math.floor((entity.x + offsets.strafeX * (entity as Player).strafeX * proximityLimit) / MAP_SCALE);
+    } else {
+        // This is the sprite calculation that doesn't work
+        targetX = Math.floor(entity.y / MAP_SCALE) * game.size + Math.floor((entity.x + offsets.x * entity.moveX * 5) / MAP_SCALE);
+        targetY = Math.floor((entity.y + offsets.y * entity.moveY * 5) / MAP_SCALE) * game.size + Math.floor(entity.x / MAP_SCALE);
+    }
 
     return { x: targetX, y: targetY, strafeX: strafeTargetX, strafeY: strafeTargetY };
 }
 
+export function calculateTargetForSpriteCollision(entity: Entity, offsets: MovementVectors): MovementVectors {
+    const x = entity.x + offsets.x * entity.moveX;
+    const y = entity.y + offsets.y * entity.moveY;
 
-export function calculateTargetForSpriteCollision(offsets: MovementVectors): MovementVectors {
-    const x = player.x + offsets.x * player.moveX;
-    const y = player.y + offsets.y * player.moveY;
-    const strafeX = player.x + offsets.strafeX * player.strafeX;
-    const strafeY = player.y + offsets.strafeY * player.strafeX;
+    let strafeX = 0;
+    let strafeY = 0;
+
+    if ('strafeX' in entity) {
+        strafeX = entity.x + offsets.strafeX * entity.strafeX;
+        strafeY = entity.y + offsets.strafeY * entity.strafeX;
+    }
     return { x, y, strafeX, strafeY }
 }
 
@@ -163,15 +186,13 @@ export function checkCollision(movePos: number, wallTarget: number, targetX: num
 
     const sprite = getSpriteAtPosition(targetX, targetY, sprites) as DestructableSprite;
     if (sprite && sprite.hitPoints <= 1 && sprite.type == 'barrel') {
-        console.log("Collision with destructible sprite");
         return true;
     }
 
     if (movePos && game.level[wallTarget] === 0 && !sprite) {
-        console.log("Collision with wall or empty space");
         return true;
     } else {
-        // console.log("Collision blocked");
+        if (movePos) console.log("Collision blocked");
         return false;
     }
 }
@@ -209,8 +230,8 @@ export function movePlayer() {
     const BarrelsArray = Object.values(barrels);
 
     const offsets = calculateMovementOffset();
-    const wallTargets = calculateTargetForWallCollision(offsets);
-    const spriteTargets = calculateTargetForSpriteCollision(offsets);
+    const wallTargets = calculateTargetForWallCollision(player, offsets);
+    const spriteTargets = calculateTargetForSpriteCollision(player, offsets);
 
     updatePlayerPosition(offsets, wallTargets, spriteTargets, BarrelsArray);
 }
@@ -219,7 +240,7 @@ export function movePlayer() {
 function checkForHit(sprites: { [id: number]: DestructableSprite }): Sprite | null {
     const offsets: MovementVectors = calculateMovementOffset(player.angle, player.equippedWeapon.range);
 
-    const targetPositions = calculateTargetForSpriteCollision(offsets);
+    const targetPositions = calculateTargetForSpriteCollision(player, offsets);
 
     const spriteArray = Object.values(sprites);
 
